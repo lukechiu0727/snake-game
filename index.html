@@ -2,1195 +2,1298 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>CYBER_SNAKE // BY LUKE CHIU</title>
-  <!-- Tailwind CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Sweetie Slither Sugar Arena - by Luke Chiu</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Orbitron & Rajdhani for Cyberpunk UI -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --neon-cyan: #00f3ff;
-      --neon-magenta: #ff0055;
-      --neon-amber: #ffb700;
-      --neon-green: #05ffa1;
-      --bg-dark: #070913;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      font-family: 'Rajdhani', sans-serif;
-      color: #e2e8f0;
-      overflow: hidden;
+    * {
       user-select: none;
       -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      padding-left: env(safe-area-inset-left, 0px);
-      padding-right: env(safe-area-inset-right, 0px);
       touch-action: none;
+      font-family: 'Fredoka', 'Quicksand', cursive, sans-serif;
     }
-
-    .font-cyber {
-      font-family: 'Orbitron', monospace;
-    }
-
-    /* CRT scanline and vignette overlay */
-    .scanlines {
-      background: linear-gradient(
-        rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.35) 50%
-      ), linear-gradient(
-        90deg,
-        rgba(255, 0, 0, 0.03),
-        rgba(0, 255, 0, 0.01),
-        rgba(0, 0, 255, 0.03)
-      );
-      background-size: 100% 4px, 6px 100%;
-      pointer-events: none;
-    }
-
-    /* Futuristic glow styling */
-    .neon-box-cyan {
-      box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
-      border: 1px solid rgba(0, 243, 255, 0.6);
-    }
-
-    .neon-text-cyan {
-      text-shadow: 0 0 8px rgba(0, 243, 255, 0.7), 0 0 18px rgba(0, 243, 255, 0.4);
-    }
-
-    .neon-text-magenta {
-      text-shadow: 0 0 8px rgba(255, 0, 85, 0.7), 0 0 18px rgba(255, 0, 85, 0.4);
-    }
-
-    .neon-button {
-      position: relative;
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-      transition: all 0.2s ease-in-out;
-      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+      background-color: #fff2f6;
     }
-
-    .neon-button:hover {
-      box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
-      transform: translateY(-1px);
+    canvas#gameCanvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background-color: #fff5f8;
     }
-
-    .neon-button:active {
-      transform: translateY(1px);
+    /* Kawaii Shadows and Bounces */
+    .kawaii-glow {
+      filter: drop-shadow(0 8px 24px rgba(244, 114, 182, 0.45));
     }
-
-    /* Cyber border accents */
-    .corner-accent {
-      position: relative;
+    .candy-btn-shadow {
+      box-shadow: 0 8px 0 #db2777, 0 15px 25px rgba(219, 39, 119, 0.35);
     }
-    .corner-accent::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      width: 8px;
-      height: 8px;
-      border-top: 2px solid var(--neon-cyan);
-      border-left: 2px solid var(--neon-cyan);
+    .candy-btn-shadow:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #db2777, 0 8px 15px rgba(219, 39, 119, 0.3);
     }
-    .corner-accent::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      right: -2px;
-      width: 8px;
-      height: 8px;
-      border-bottom: 2px solid var(--neon-cyan);
-      border-right: 2px solid var(--neon-cyan);
+    @keyframes floatingSweets {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(5deg); }
     }
-
-    /* Touch Control Buttons with tactile feedback */
-    .d-pad-btn {
-      touch-action: manipulation;
-      backdrop-filter: blur(12px);
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 0.08s ease, background-color 0.1s ease, box-shadow 0.1s ease;
+    .animate-float {
+      animation: floatingSweets 3.2s ease-in-out infinite;
     }
-    .d-pad-btn:active {
-      background-color: rgba(0, 243, 255, 0.45);
-      transform: scale(0.90);
-      box-shadow: 0 0 20px rgba(0, 243, 255, 0.8), inset 0 0 10px rgba(0, 243, 255, 0.4);
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
     }
-
-    /* Cyber Cinematic Intro Animations */
-    @keyframes glitch-anim {
-      0% { transform: translate(0); text-shadow: -2px 2px #ff0055, 2px -2px #00f3ff; }
-      20% { transform: translate(-3px, 2px); text-shadow: 3px -1px #ff0055, -2px 2px #00f3ff; }
-      40% { transform: translate(-1px, -2px); text-shadow: -2px -2px #ff0055, 1px 3px #00f3ff; }
-      60% { transform: translate(3px, 1px); text-shadow: 2px 2px #ff0055, -3px -1px #00f3ff; }
-      80% { transform: translate(1px, -2px); text-shadow: -1px 2px #ff0055, 2px -2px #00f3ff; }
-      100% { transform: translate(0); text-shadow: -2px 2px #ff0055, 2px -2px #00f3ff; }
+    .animate-wiggle {
+      animation: wiggle 1.8s ease-in-out infinite;
     }
-
-    .glitch-text {
-      animation: glitch-anim 0.28s infinite alternate;
+    @keyframes sparkleSpin {
+      0% { transform: rotate(0deg) scale(0.9); }
+      50% { transform: rotate(180deg) scale(1.15); }
+      100% { transform: rotate(360deg) scale(0.9); }
     }
-
-    @keyframes laser-sweep {
-      0% { top: -10%; opacity: 0; }
-      50% { opacity: 1; }
-      100% { top: 110%; opacity: 0; }
-    }
-
-    .laser-line {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #00f3ff, #ff0055, #00f3ff, transparent);
-      box-shadow: 0 0 15px #00f3ff, 0 0 25px #ff0055;
-      animation: laser-sweep 2.2s infinite ease-in-out;
+    .sparkle-icon {
+      animation: sparkleSpin 4s linear infinite;
     }
   </style>
 </head>
-<body class="h-[100dvh] w-screen flex flex-col items-center justify-between p-2 sm:p-4 relative select-none">
-  <!-- Scanlines filter -->
-  <div class="scanlines fixed inset-0 z-40 pointer-events-none"></div>
+<body class="relative text-pink-900 select-none overflow-hidden">
 
-  <!-- Cyberpunk Intro Overlay -->
-  <div id="introOverlay" class="fixed inset-0 z-50 bg-[#04060c] flex flex-col items-center justify-center p-6 text-center select-none overflow-hidden transition-opacity duration-700">
-    <div class="laser-line"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,243,255,0.12)_0%,transparent_70%)] pointer-events-none"></div>
+  <!-- Main Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
 
-    <div class="relative z-10 flex flex-col items-center max-w-sm w-full">
-      <!-- Boot status telemetry -->
-      <div id="introBootStatus" class="font-cyber text-[10px] sm:text-xs text-cyan-400 tracking-[0.25em] mb-4 uppercase opacity-80">
-        [INITIALIZING NEURAL LINK...]
+  <!-- HUD Overlay -->
+  <div id="hudLayer" class="absolute inset-0 pointer-events-none hidden flex flex-col justify-between p-4 z-10">
+    <!-- Top Bar -->
+    <div class="flex justify-between items-start">
+      <!-- Player Stats Card -->
+      <div class="bg-white/90 backdrop-blur-md border-3 border-pink-300 rounded-3xl px-5 py-3 shadow-xl flex items-center space-x-4 pointer-events-auto">
+        <div class="flex items-center space-x-2.5">
+          <span class="text-2xl animate-wiggle">🍰</span>
+          <div>
+            <div class="text-[11px] text-pink-400 font-bold uppercase tracking-wider">Sugar Score</div>
+            <div id="scoreVal" class="text-2xl font-black text-pink-600">100</div>
+          </div>
+        </div>
+        <div class="h-9 w-0.5 bg-pink-200"></div>
+        <div>
+          <div class="text-[11px] text-pink-400 font-bold uppercase tracking-wider">Length</div>
+          <div id="lengthVal" class="text-xl font-bold text-purple-500">25</div>
+        </div>
+        <div class="h-9 w-0.5 bg-pink-200"></div>
+        <div>
+          <div class="text-[11px] text-pink-400 font-bold uppercase tracking-wider">Sweeties Left</div>
+          <div id="enemiesCountVal" class="text-xl font-bold text-amber-500">12</div>
+        </div>
       </div>
 
-      <!-- Creator highlight badge -->
-      <div class="w-full flex items-center justify-center space-x-2 my-1">
-        <span class="h-[1px] w-8 sm:w-12 bg-gradient-to-r from-transparent to-pink-500"></span>
-        <span class="text-xs sm:text-sm font-cyber tracking-[0.3em] text-pink-400 font-bold uppercase neon-text-magenta">
-          A PRODUCTION BY
-        </span>
-        <span class="h-[1px] w-8 sm:w-12 bg-gradient-to-l from-transparent to-pink-500"></span>
+      <!-- Leaderboard -->
+      <div class="bg-white/90 backdrop-blur-md border-3 border-purple-200 rounded-3xl p-3.5 shadow-xl w-52 hidden sm:block pointer-events-auto">
+        <div class="text-xs font-bold uppercase tracking-wider text-purple-600 mb-2 flex items-center justify-between">
+          <span>👑 Sugar High Score</span>
+          <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-bold">Top 5</span>
+        </div>
+        <ol id="leaderboardList" class="text-xs space-y-1.5 font-bold">
+          <!-- Populated in JS -->
+        </ol>
+      </div>
+    </div>
+
+    <!-- Bottom Controls Zone -->
+    <div class="flex justify-between items-end pb-2 pointer-events-auto">
+      <!-- Virtual Joystick container (Mobile & touch-enabled) -->
+      <div id="joystickZone" class="w-36 h-36 relative rounded-full bg-white/70 backdrop-blur-md border-4 border-pink-300 flex items-center justify-center shadow-lg shadow-pink-200 select-none touch-none">
+        <div id="joystickKnob" class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 shadow-md shadow-pink-400/50 border-3 border-white pointer-events-none transform transition-transform duration-75 flex items-center justify-center text-white text-xl">
+          🍓
+        </div>
       </div>
 
-      <!-- Big animated name -->
-      <div class="my-4 relative">
-        <h1 id="introCreatorName" class="font-cyber font-black text-3xl sm:text-4xl tracking-[0.18em] text-white glitch-text uppercase" style="text-shadow: 0 0 20px rgba(0,243,255,0.8), 0 0 35px rgba(255,0,85,0.8);">
-          LUKE CHIU
-        </h1>
-        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-cyan-400 via-pink-500 to-cyan-400 shadow-[0_0_10px_#00f3ff]"></div>
+      <!-- Center Tip for Desktop -->
+      <div class="hidden md:flex flex-col items-center text-xs text-pink-700 bg-white/85 backdrop-blur-sm px-5 py-2.5 rounded-2xl border-2 border-pink-200 shadow-md">
+        <span>🐾 <span class="bg-pink-100 px-2 py-0.5 rounded-md font-bold text-pink-600">Mouse</span> or <span class="bg-pink-100 px-2 py-0.5 rounded-md font-bold text-pink-600">WASD / Arrow Keys</span> to steer</span>
+        <span class="mt-1">✨ Hold <span class="bg-purple-100 px-2 py-0.5 rounded-md font-bold text-purple-600">SPACE</span> or Click to trigger <b>Sugar Rush!</b></span>
       </div>
 
-      <p id="introSubtext" class="text-xs sm:text-sm font-cyber text-cyan-300/80 tracking-widest mt-2 mb-6">
-        NEURAL ARCHITECTURE // v2.06
-      </p>
-
-      <!-- Skip / Proceed Button -->
-      <button id="skipIntroBtn" class="neon-button px-6 py-2 bg-transparent border border-cyan-400/60 hover:border-cyan-300 text-cyan-300 font-cyber text-xs tracking-widest uppercase rounded shadow-[0_0_15px_rgba(0,243,255,0.3)] active:scale-95 transition-all">
-        ENTER GRID [SKIP]
-      </button>
+      <!-- Sugar Rush / Sprint Button (Right) -->
+      <div class="flex flex-col items-center">
+        <button id="boostBtn" class="w-22 h-22 p-4 rounded-full bg-gradient-to-tr from-pink-500 via-rose-400 to-amber-300 shadow-lg shadow-pink-400/50 border-4 border-white flex flex-col items-center justify-center text-white active:scale-95 transition-transform duration-100">
+          <span class="text-2xl">⚡🍩</span>
+          <span class="text-[11px] font-black tracking-wide uppercase mt-0.5">Rush!</span>
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Ambient background glow elements -->
-  <div class="fixed top-1/4 left-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
-  <div class="fixed bottom-1/4 right-1/4 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+  <!-- Mini Map Overlay -->
+  <div id="minimapContainer" class="absolute bottom-5 right-28 sm:bottom-auto sm:top-48 sm:right-4 z-20 pointer-events-none hidden">
+    <canvas id="minimapCanvas" width="130" height="130" class="rounded-2xl border-3 border-pink-300 bg-white/80 shadow-xl backdrop-blur-md"></canvas>
+  </div>
 
-  <!-- Top Header / HUD Bar -->
-  <header class="w-full max-w-md flex flex-col items-center z-10 shrink-0">
-    <div class="flex items-center justify-between w-full px-2 py-1 border-b border-cyan-500/30">
-      <div class="flex items-center space-x-2">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-        <div class="flex flex-col">
-          <h1 class="font-cyber text-lg sm:text-xl font-black tracking-widest text-cyan-400 neon-text-cyan leading-tight">
-            NEON_SNAKE
-          </h1>
-          <span class="text-xs sm:text-sm tracking-wider text-pink-400 font-cyber font-black neon-text-magenta">
-            ⚡ BY LUKE CHIU ⚡
-          </span>
-        </div>
-      </div>
+  <!-- Cute Opening Splash Screen -->
+  <div id="introScreen" class="absolute inset-0 z-30 flex items-center justify-center bg-gradient-to-b from-[#fff0f5]/95 via-[#ffe6ef]/95 to-[#fce4ec]/95 backdrop-blur-md px-4">
+    <div class="max-w-md w-full text-center space-y-5 animate-float">
       
-      <!-- Audio toggle & Info icon -->
-      <div class="flex items-center space-x-2">
-        <button id="warpToggleBtn" class="text-[11px] uppercase tracking-wider px-2 py-1 rounded bg-slate-900/80 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 transition-all flex items-center gap-1 active:scale-95">
-          <span>PORTAL:</span>
-          <span id="warpLabel" class="font-bold">ON</span>
-        </button>
-        <button id="soundToggleBtn" class="text-[11px] uppercase tracking-wider px-2 py-1 rounded bg-slate-900/80 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 transition-all flex items-center gap-1 active:scale-95">
-          <svg id="soundIconOn" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-          </svg>
-          <span id="soundLabel">SFX</span>
-        </button>
+      <!-- Top Sweets Garland Banner -->
+      <div class="flex items-center justify-center space-x-3 text-3xl">
+        <span class="animate-wiggle">🧁</span>
+        <span class="sparkle-icon">✨</span>
+        <span class="text-4xl animate-bounce">🍩</span>
+        <span class="sparkle-icon">✨</span>
+        <span class="animate-wiggle">🍓</span>
       </div>
-    </div>
 
-    <!-- Live Telemetry Display -->
-    <div class="grid grid-cols-3 gap-2 w-full mt-2 font-cyber">
-      <div class="bg-slate-950/70 p-1.5 sm:p-2 rounded neon-box-cyan flex flex-col items-center corner-accent">
-        <span class="text-[9px] text-cyan-400/80 tracking-wider">SCORE</span>
-        <span id="scoreDisplay" class="text-lg sm:text-xl font-bold text-cyan-300">0000</span>
+      <div class="inline-block px-4 py-1.5 rounded-full bg-pink-100 border-2 border-pink-300 text-pink-600 text-xs font-bold uppercase tracking-wider shadow-sm">
+        🍧 Sweet 360° Dessert Slither Arena 🍬
       </div>
-      <div class="bg-slate-950/70 p-1.5 sm:p-2 rounded neon-box-cyan flex flex-col items-center corner-accent">
-        <span class="text-[9px] text-pink-400/80 tracking-wider">HIGH</span>
-        <span id="highScoreDisplay" class="text-lg sm:text-xl font-bold text-pink-400 neon-text-magenta">0000</span>
-      </div>
-      <div class="bg-slate-950/70 p-1.5 sm:p-2 rounded neon-box-cyan flex flex-col items-center corner-accent">
-        <span class="text-[9px] text-amber-400/80 tracking-wider">SPEED</span>
-        <span id="speedDisplay" class="text-lg sm:text-xl font-bold text-amber-400">LVL 01</span>
-      </div>
-    </div>
-  </header>
 
-  <!-- Game Arena Centerpiece (Optimized for iPhone dimensions) -->
-  <main class="relative flex items-center justify-center w-full max-w-md my-auto z-10 px-2">
-    <div class="relative w-full aspect-square max-h-[46vh] rounded-xl overflow-hidden neon-box-cyan bg-slate-950/95 shadow-2xl">
-      <!-- HTML5 Canvas for Game Rendering -->
-      <canvas id="gameCanvas" class="w-full h-full block touch-none"></canvas>
+      <!-- Main Game Title -->
+      <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-rose-400 to-purple-500 kawaii-glow">
+        SWEETIE SLITHER
+      </h1>
 
-      <!-- Start / Ready Screen Overlay -->
-      <div id="startOverlay" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center transition-opacity duration-300">
-        <div class="mb-3 px-4 py-1.5 rounded-lg text-sm sm:text-base font-cyber font-black tracking-widest text-pink-400 border-2 border-pink-500/80 bg-pink-950/40 neon-box-cyan neon-text-magenta animate-pulse shadow-lg">
-          ★ CREATED BY LUKE CHIU ★
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-cyber font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-pink-400 to-amber-300 mb-1">
-          EASY PLAY MODE
-        </h2>
-        <p class="text-xs text-slate-300 max-w-xs mb-4 font-medium">
-          Swipe anywhere on screen or tap the thumb pad. Wall portal mode prevents instant crashes!
+      <!-- Mandatory "Created by Luke Chiu" with Cute Theme -->
+      <div class="py-1">
+        <p class="text-xs font-bold tracking-widest text-purple-400 uppercase">Designed with Love by</p>
+        <p class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 mt-0.5 tracking-wide drop-shadow-sm flex items-center justify-center gap-2">
+          <span>💖</span> Created by Luke Chiu <span>🍰</span>
         </p>
-        <button id="startGameBtn" class="neon-button px-7 py-2.5 bg-cyan-500 hover:bg-cyan-400 active:scale-95 text-slate-950 font-cyber font-bold tracking-widest text-xs rounded shadow-lg shadow-cyan-500/50 uppercase cursor-pointer">
-          START RUN
+      </div>
+
+      <!-- Cute Features Card -->
+      <div class="grid grid-cols-2 gap-2.5 text-xs text-left font-bold text-pink-800 bg-white/80 p-4 rounded-3xl border-2 border-pink-200 shadow-md">
+        <div class="flex items-center space-x-2">
+          <span class="text-base">🧸</span>
+          <span>Safe from self-bumps!</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-base">🧋</span>
+          <span>Yummy dessert foods</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-base">🎀</span>
+          <span>Cute anime blush snakes</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-base">🍭</span>
+          <span>Smooth 360° steering</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div>
+        <button id="startBtn" class="w-full py-4 rounded-3xl font-black text-xl uppercase tracking-wider bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 candy-btn-shadow border-3 border-white text-white flex items-center justify-center space-x-2 transition-all">
+          <span>Let's Feast!</span>
+          <span class="text-2xl">🍰✨</span>
         </button>
       </div>
 
-      <!-- Game Over Overlay -->
-      <div id="gameOverOverlay" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center opacity-0 pointer-events-none transition-all duration-300">
-        <div class="mb-2 px-3 py-1 rounded text-xs font-cyber font-bold tracking-widest text-pink-300 border border-pink-500/50 bg-pink-950/30">
-          SYSTEM PURGED // ARCHITECT: LUKE CHIU
-        </div>
-        <span class="text-[10px] font-cyber text-pink-500 tracking-widest mb-1 animate-pulse">CONNECTION TERMINATED</span>
-        <h2 class="text-3xl font-cyber font-black tracking-wider text-pink-500 neon-text-magenta mb-3">
-          SYSTEM PURGED
-        </h2>
-        <div class="w-full max-w-[240px] bg-slate-900/80 border border-pink-500/40 rounded-lg p-3 mb-4 text-left font-cyber text-xs space-y-1.5">
-          <div class="flex justify-between">
-            <span class="text-slate-400">DATA EXTRACTED:</span>
-            <span id="finalScore" class="text-cyan-400 font-bold">0000</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">RECORD PEAK:</span>
-            <span id="finalHigh" class="text-pink-400 font-bold">0000</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">MAX VELOCITY:</span>
-            <span id="finalSpeed" class="text-amber-400 font-bold">LVL 01</span>
-          </div>
-        </div>
-        <button id="restartGameBtn" class="neon-button px-7 py-2.5 bg-pink-600 hover:bg-pink-500 active:scale-95 text-white font-cyber font-bold tracking-widest text-xs rounded shadow-lg shadow-pink-600/50 uppercase cursor-pointer">
-          REBOOT SYSTEM
-        </button>
+      <div class="text-xs text-pink-500 font-bold">
+        🌸 Coiling around your own body is 100% safe — wrap up to protect your sweets!
       </div>
-
-      <!-- Pause Indicator -->
-      <div id="pauseOverlay" class="absolute top-3 right-3 bg-slate-900/80 border border-amber-400 text-amber-400 px-2.5 py-0.5 font-cyber text-[10px] rounded tracking-widest hidden animate-pulse">
-        PAUSED
-      </div>
-    </div>
-  </main>
-
-  <!-- Mobile / Touch Controls D-Pad (Refined ergonomic iPhone layout) -->
-  <div class="w-full max-w-xs flex flex-col items-center z-10 shrink-0 mb-1">
-    <button id="btnUp" class="d-pad-btn w-16 h-13 sm:w-16 sm:h-12 mb-1.5 flex items-center justify-center rounded-2xl bg-slate-900/90 border-2 border-cyan-400/60 text-cyan-300 shadow-[0_0_12px_rgba(0,243,255,0.25)] active:bg-cyan-400/40">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M5 15l7-7 7 7" />
-      </svg>
-    </button>
-    <div class="flex justify-between w-56 sm:w-52">
-      <button id="btnLeft" class="d-pad-btn w-16 h-13 sm:w-16 sm:h-12 flex items-center justify-center rounded-2xl bg-slate-900/90 border-2 border-cyan-400/60 text-cyan-300 shadow-[0_0_12px_rgba(0,243,255,0.25)] active:bg-cyan-400/40">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <button id="btnDown" class="d-pad-btn w-16 h-13 sm:w-16 sm:h-12 flex items-center justify-center rounded-2xl bg-slate-900/90 border-2 border-cyan-400/60 text-cyan-300 shadow-[0_0_12px_rgba(0,243,255,0.25)] active:bg-cyan-400/40">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      <button id="btnRight" class="d-pad-btn w-16 h-13 sm:w-16 sm:h-12 flex items-center justify-center rounded-2xl bg-slate-900/90 border-2 border-cyan-400/60 text-cyan-300 shadow-[0_0_12px_rgba(0,243,255,0.25)] active:bg-cyan-400/40">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
     </div>
   </div>
 
-  <!-- Bottom status info -->
-  <footer class="text-xs text-slate-400 tracking-wider font-cyber flex items-center justify-center gap-3 z-10 shrink-0 pb-1">
-    <span class="text-pink-400 font-extrabold text-sm tracking-widest neon-text-magenta">⚡ DEVELOPED BY LUKE CHIU ⚡</span>
-    <span class="text-cyan-500">•</span>
-    <span>FPS: <span id="fpsCounter">60</span></span>
-  </footer>
+  <!-- Game Over Screen -->
+  <div id="gameOverScreen" class="absolute inset-0 z-30 flex items-center justify-center bg-pink-950/40 backdrop-blur-md hidden px-4">
+    <div class="max-w-sm w-full bg-white/95 border-4 border-pink-300 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
+      <div class="w-20 h-20 rounded-full bg-pink-100 border-3 border-pink-300 flex items-center justify-center mx-auto text-4xl animate-wiggle">
+        🥺🧁
+      </div>
+      <div>
+        <h2 class="text-3xl font-black text-pink-600 tracking-wide">SUGAR CRASH!</h2>
+        <p id="deathCause" class="text-xs font-bold text-pink-400 mt-1">You bumped into a sweetie snake.</p>
+      </div>
+
+      <div class="bg-pink-50 rounded-2xl p-4 border-2 border-pink-200 flex justify-around">
+        <div>
+          <div class="text-[11px] text-pink-400 font-bold uppercase">Dessert Score</div>
+          <div id="finalScoreVal" class="text-2xl font-black text-pink-600">0</div>
+        </div>
+        <div class="h-10 w-0.5 bg-pink-200"></div>
+        <div>
+          <div class="text-[11px] text-pink-400 font-bold uppercase">Treats Eaten</div>
+          <div id="finalKillsVal" class="text-2xl font-black text-purple-500">0</div>
+        </div>
+      </div>
+
+      <button id="respawnBtn" class="w-full py-3.5 rounded-2xl font-black uppercase tracking-wider bg-gradient-to-r from-pink-400 to-purple-400 text-white candy-btn-shadow border-2 border-white active:scale-95 transition">
+        🍓 Have Another Treat!
+      </button>
+
+      <div class="text-[11px] text-pink-400 font-bold uppercase tracking-widest">
+        Sweetie Slither by Luke Chiu
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Synthesizer (Tone.js via CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
 
   <script>
-    /* ==========================================================================
-       SYNTHESIZED SOUND SYSTEM (Web Audio API)
-       Self-contained cyber audio without external asset dependencies
-       ========================================================================== */
-    class CyberAudio {
-      constructor() {
-        this.ctx = null;
-        this.muted = false;
-      }
+    /* ========================================================
+       GAME CONSTANTS & CONFIGURATION
+       ======================================================== */
+    const WORLD_WIDTH = 3400;
+    const WORLD_HEIGHT = 3400;
+    const WORLD_RADIUS = 1600; // Circular arena bounds
+    const INITIAL_SNAKE_LENGTH = 28;
+    const SEGMENT_DISTANCE = 12;
+    const BASE_SPEED = 3.6;
+    const BOOST_SPEED = 7.2;
+    const BOT_COUNT = 15;
+    const FOOD_COUNT = 340;
 
-      init() {
-        if (!this.ctx) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          this.ctx = new AudioContext();
-        }
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume();
-        }
-      }
+    // Dessert Varieties List
+    const DESSERT_TYPES = [
+      { name: 'Cupcake', icon: '🧁', val: 2, radius: 14, color: '#f472b6' },
+      { name: 'Donut', icon: '🍩', val: 3, radius: 15, color: '#fb7185' },
+      { name: 'Strawberry', icon: '🍓', val: 1.5, radius: 12, color: '#ef4444' },
+      { name: 'Boba', icon: '🧋', val: 3.5, radius: 16, color: '#d97706' },
+      { name: 'Macaron', icon: '🍪', val: 2, radius: 13, color: '#c084fc' },
+      { name: 'Ice Cream', icon: '🍦', val: 2.5, radius: 15, color: '#38bdf8' },
+      { name: 'Lollipop', icon: '🍭', val: 2, radius: 14, color: '#f43f5e' },
+      { name: 'Cake Slice', icon: '🍰', val: 4, radius: 17, color: '#ec4899' },
+      { name: 'Candy', icon: '🍬', val: 1, radius: 11, color: '#a855f7' },
+      { name: 'Pudding', icon: '🍮', val: 3, radius: 15, color: '#eab308' }
+    ];
 
-      playTone(freq, type = 'sine', duration = 0.1, stopGain = 0.001) {
-        if (this.muted) return;
-        this.init();
-        try {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-
-          osc.type = type;
-          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-
-          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(stopGain, this.ctx.currentTime + duration);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start();
-          osc.stop(this.ctx.currentTime + duration);
-        } catch (e) {
-          // Audio fallback fails silently
-        }
-      }
-
-      eatFoodSound() {
-        if (this.muted) return;
-        this.init();
-        try {
-          const now = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(520, now);
-          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
-
-          gain.gain.setValueAtTime(0.18, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(now);
-          osc.stop(now + 0.15);
-        } catch (e) {}
-      }
-
-      bonusFoodSound() {
-        if (this.muted) return;
-        this.init();
-        try {
-          const now = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(440, now);
-          osc.frequency.linearRampToValueAtTime(1100, now + 0.2);
-
-          gain.gain.setValueAtTime(0.15, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(now);
-          osc.stop(now + 0.25);
-        } catch (e) {}
-      }
-
-      crashSound() {
-        if (this.muted) return;
-        this.init();
-        try {
-          const now = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(160, now);
-          osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
-
-          gain.gain.setValueAtTime(0.3, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(now);
-          osc.stop(now + 0.4);
-        } catch (e) {}
-      }
-
-      moveSound() {
-        if (this.muted) return;
-        this.playTone(180, 'sine', 0.03, 0.001);
-      }
-
-      introBoopSound(freq = 440) {
-        if (this.muted) return;
-        this.playTone(freq, 'sawtooth', 0.08, 0.001);
-      }
-
-      introBoomSound() {
-        if (this.muted) return;
-        this.init();
-        try {
-          const now = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(320, now);
-          osc.frequency.exponentialRampToValueAtTime(45, now + 1.2);
-
-          gain.gain.setValueAtTime(0.35, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(now);
-          osc.stop(now + 1.2);
-        } catch (e) {}
-      }
-    }
-
-    const audio = new CyberAudio();
-
-    /* ==========================================================================
-       GAME ENGINE & STATE
-       ========================================================================== */
+    // Canvas setup
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const minimapCanvas = document.getElementById('minimapCanvas');
+    const minimapCtx = minimapCanvas.getContext('2d');
 
-    // UI Element references
-    const scoreDisplay = document.getElementById('scoreDisplay');
-    const highScoreDisplay = document.getElementById('highScoreDisplay');
-    const speedDisplay = document.getElementById('speedDisplay');
-    const startOverlay = document.getElementById('startOverlay');
-    const gameOverOverlay = document.getElementById('gameOverOverlay');
-    const pauseOverlay = document.getElementById('pauseOverlay');
-    const startGameBtn = document.getElementById('startGameBtn');
-    const restartGameBtn = document.getElementById('restartGameBtn');
-    const soundToggleBtn = document.getElementById('soundToggleBtn');
-    const soundLabel = document.getElementById('soundLabel');
-    const warpToggleBtn = document.getElementById('warpToggleBtn');
-    const warpLabel = document.getElementById('warpLabel');
-    const introOverlay = document.getElementById('introOverlay');
-    const introBootStatus = document.getElementById('introBootStatus');
-    const introCreatorName = document.getElementById('introCreatorName');
-    const skipIntroBtn = document.getElementById('skipIntroBtn');
-    const finalScore = document.getElementById('finalScore');
-    const finalHigh = document.getElementById('finalHigh');
-    const finalSpeed = document.getElementById('finalSpeed');
-    const fpsCounter = document.getElementById('fpsCounter');
+    // UI Elements
+    const introScreen = document.getElementById('introScreen');
+    const hudLayer = document.getElementById('hudLayer');
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const startBtn = document.getElementById('startBtn');
+    const respawnBtn = document.getElementById('respawnBtn');
+    const scoreVal = document.getElementById('scoreVal');
+    const lengthVal = document.getElementById('lengthVal');
+    const enemiesCountVal = document.getElementById('enemiesCountVal');
+    const leaderboardList = document.getElementById('leaderboardList');
+    const minimapContainer = document.getElementById('minimapContainer');
+    const deathCause = document.getElementById('deathCause');
+    const finalScoreVal = document.getElementById('finalScoreVal');
+    const finalKillsVal = document.getElementById('finalKillsVal');
+    const boostBtn = document.getElementById('boostBtn');
+    const joystickZone = document.getElementById('joystickZone');
+    const joystickKnob = document.getElementById('joystickKnob');
 
-    // Easier grid configuration: 18x18 for larger targets and clearer visuals
-    const GRID_SIZE = 18;
-    let cellSize = 0;
+    // Sweet Web Audio using Tone.js
+    let sfxInitialized = false;
+    let eatSynth, boostSynth, deathSynth;
 
-    // Game variables
-    let snake = [];
-    let direction = { x: 1, y: 0 };
-    let inputQueue = []; // Buffered inputs prevent missing turns and accidental reverse deaths
-    let food = { x: 12, y: 9, type: 'regular' };
-    let bonusFood = null;
-    let bonusTimer = 0;
-    let score = 0;
-    let highScore = localStorage.getItem('cyber_snake_highscore') || 0;
-    let speedLevel = 1;
-    let gameSpeed = 160; // Much gentler initial speed (160ms vs 120ms)
-    let warpMode = true; // Portal wrap-around enabled by default for easy play
-    let lastStepTime = 0;
-    let isGameOver = false;
-    let isGameRunning = false;
-    let isPaused = false;
-    let particles = [];
+    function initAudio() {
+      if (sfxInitialized) return;
+      try {
+        // High-pitched marimba/celesta style cute chime
+        eatSynth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: "triangle" },
+          envelope: { attack: 0.005, decay: 0.15, sustain: 0.02, release: 0.12 }
+        }).toDestination();
+        eatSynth.volume.value = -8;
 
-    // Frame Rate Tracking
-    let lastFrameTime = performance.now();
-    let frameCount = 0;
-    let fpsTimer = performance.now();
+        boostSynth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: "sine" },
+          envelope: { attack: 0.05, decay: 0.2, sustain: 0.1, release: 0.2 }
+        }).toDestination();
+        boostSynth.volume.value = -18;
 
-    /* ==========================================================================
-       RESIZING & CANVAS BUFFERING
-       ========================================================================== */
-    function resizeCanvas() {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      const pixelRatio = window.devicePixelRatio || 1;
-      
-      // Keep internal resolution high for crisp rendering
-      canvas.width = rect.width * pixelRatio;
-      canvas.height = rect.height * pixelRatio;
+        deathSynth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: "sawtooth" },
+          envelope: { attack: 0.01, decay: 0.3, sustain: 0, release: 0.2 }
+        }).toDestination();
+        deathSynth.volume.value = -10;
 
-      ctx.resetTransform?.();
-      ctx.scale(pixelRatio, pixelRatio);
-
-      cellSize = rect.width / GRID_SIZE;
+        Tone.start();
+        sfxInitialized = true;
+      } catch (err) {
+        console.warn("Audio init postponed", err);
+      }
     }
 
-    window.addEventListener('resize', resizeCanvas);
+    function playEatSound() {
+      if (!sfxInitialized || Tone.context.state !== 'running') return;
+      const notes = ["C6", "E6", "G6", "A6", "C7"];
+      const note = notes[Math.floor(Math.random() * notes.length)];
+      eatSynth.triggerAttackRelease(note, "32n");
+    }
 
-    /* ==========================================================================
-       PARTICLE SYSTEM (Neon Spikes / Data Bursts)
-       ========================================================================== */
-    class Particle {
-      constructor(x, y, color) {
+    function playKillSound() {
+      if (!sfxInitialized || Tone.context.state !== 'running') return;
+      deathSynth.triggerAttackRelease(["C4", "A3", "F3"], "16n");
+    }
+
+    /* ========================================================
+       RESIZE HANDLER
+       ======================================================== */
+    let screenWidth = window.innerWidth;
+    let screenHeight = window.innerHeight;
+
+    function handleResize() {
+      screenWidth = window.innerWidth;
+      screenHeight = window.innerHeight;
+      canvas.width = screenWidth;
+      canvas.height = screenHeight;
+    }
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    /* ========================================================
+       VECTOR MATH HELPERS
+       ======================================================== */
+    function normalizeAngle(angle) {
+      while (angle < -Math.PI) angle += Math.PI * 2;
+      while (angle > Math.PI) angle -= Math.PI * 2;
+      return angle;
+    }
+
+    function lerp(start, end, amt) {
+      return (1 - amt) * start + amt * end;
+    }
+
+    function getDistance(x1, y1, x2, y2) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    /* ========================================================
+       DESSERT FOOD CLASS (Delicious treats with emoji & sparkles)
+       ======================================================== */
+    class DessertFood {
+      constructor(x, y, dessertData = null) {
         this.x = x;
         this.y = y;
-        this.color = color;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 3 + 1;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        this.alpha = 1;
-        this.life = Math.random() * 20 + 20;
-        this.size = Math.random() * 3 + 1.5;
+        const chosen = dessertData || DESSERT_TYPES[Math.floor(Math.random() * DESSERT_TYPES.length)];
+        this.name = chosen.name;
+        this.icon = chosen.icon;
+        this.value = chosen.val;
+        this.baseRadius = chosen.radius;
+        this.color = chosen.color;
+        this.pulse = Math.random() * Math.PI * 2;
+        this.pulseSpeed = 0.04 + Math.random() * 0.04;
       }
 
       update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha -= 1 / this.life;
-        this.size *= 0.96;
+        this.pulse += this.pulseSpeed;
       }
 
-      draw(c) {
-        c.save();
-        c.globalAlpha = Math.max(0, this.alpha);
-        c.shadowColor = this.color;
-        c.shadowBlur = 6;
-        c.fillStyle = this.color;
-        c.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
-        c.restore();
-      }
-    }
+      draw(ctx, camX, camY) {
+        const screenX = this.x - camX + screenWidth / 2;
+        const screenY = this.y - camY + screenHeight / 2;
 
-    function spawnFoodParticles(gx, gy, color) {
-      const centerX = gx * cellSize + cellSize / 2;
-      const centerY = gy * cellSize + cellSize / 2;
-      for (let i = 0; i < 18; i++) {
-        particles.push(new Particle(centerX, centerY, color));
-      }
-    }
-
-    /* ==========================================================================
-       CORE GAME MECHANICS
-       ========================================================================== */
-    function initGame() {
-      snake = [
-        { x: 5, y: 9 },
-        { x: 4, y: 9 },
-        { x: 3, y: 9 }
-      ];
-      direction = { x: 1, y: 0 };
-      inputQueue = [];
-      score = 0;
-      speedLevel = 1;
-      gameSpeed = 160; // Slower and relaxed starting speed
-      isGameOver = false;
-      isPaused = false;
-      particles = [];
-      bonusFood = null;
-      spawnFood();
-      updateHUD();
-      resizeCanvas();
-    }
-
-    function spawnFood() {
-      let valid = false;
-      while (!valid) {
-        const nx = Math.floor(Math.random() * GRID_SIZE);
-        const ny = Math.floor(Math.random() * GRID_SIZE);
-        
-        // Ensure food does not spawn inside snake
-        const insideSnake = snake.some(seg => seg.x === nx && seg.y === ny);
-        if (!insideSnake) {
-          food = { x: nx, y: ny, type: 'regular' };
-          valid = true;
-        }
-      }
-
-      // Bonus food spawn
-      if (Math.random() < 0.3 && !bonusFood) {
-        spawnBonusFood();
-      }
-    }
-
-    function spawnBonusFood() {
-      let valid = false;
-      while (!valid) {
-        const nx = Math.floor(Math.random() * GRID_SIZE);
-        const ny = Math.floor(Math.random() * GRID_SIZE);
-        const collision = snake.some(s => s.x === nx && s.y === ny) || (food.x === nx && food.y === ny);
-        if (!collision) {
-          bonusFood = { x: nx, y: ny, timer: 75 }; // generous 75-tick window
-          valid = true;
-        }
-      }
-    }
-
-    function update() {
-      if (!isGameRunning || isGameOver || isPaused) return;
-
-      // Process next queued command safely
-      if (inputQueue.length > 0) {
-        const nextDir = inputQueue.shift();
-        // Disallow immediate 180 reverse against current motion
-        if (!(nextDir.x !== 0 && direction.x === -nextDir.x) &&
-            !(nextDir.y !== 0 && direction.y === -nextDir.y)) {
-          direction = nextDir;
-        }
-      }
-
-      let nextX = snake[0].x + direction.x;
-      let nextY = snake[0].y + direction.y;
-
-      // Wrap-around portals (easy mode) vs strict walls
-      if (warpMode) {
-        if (nextX < 0) nextX = GRID_SIZE - 1;
-        else if (nextX >= GRID_SIZE) nextX = 0;
-
-        if (nextY < 0) nextY = GRID_SIZE - 1;
-        else if (nextY >= GRID_SIZE) nextY = 0;
-      } else {
-        if (nextX < 0 || nextX >= GRID_SIZE || nextY < 0 || nextY >= GRID_SIZE) {
-          triggerGameOver();
+        // Viewport culling
+        if (screenX < -30 || screenX > screenWidth + 30 || screenY < -30 || screenY > screenHeight + 30) {
           return;
         }
-      }
 
-      const head = { x: nextX, y: nextY };
+        const bounce = Math.sin(this.pulse) * 2;
+        const drawRadius = this.baseRadius + bounce;
 
-      // Self Collision Check (ignore tail end since it moves on this tick)
-      const hitSelf = snake.slice(0, -1).some(seg => seg.x === head.x && seg.y === head.y);
-      if (hitSelf) {
-        triggerGameOver();
-        return;
-      }
-
-      snake.unshift(head);
-
-      // Check standard food pickup
-      if (head.x === food.x && head.y === food.y) {
-        score += 10;
-        audio.eatFoodSound();
-        triggerHaptic(25);
-        spawnFoodParticles(food.x, food.y, '#00f3ff');
-        adjustDifficulty();
-        spawnFood();
-      } 
-      // Check bonus cyber gem pickup
-      else if (bonusFood && head.x === bonusFood.x && head.y === bonusFood.y) {
-        score += 35;
-        audio.bonusFoodSound();
-        triggerHaptic([35, 40, 35]);
-        spawnFoodParticles(bonusFood.x, bonusFood.y, '#ff0055');
-        bonusFood = null;
-        adjustDifficulty();
-      } else {
-        snake.pop();
-      }
-
-      // Manage bonus food timer
-      if (bonusFood) {
-        bonusFood.timer--;
-        if (bonusFood.timer <= 0) {
-          bonusFood = null;
-        }
-      }
-
-      updateHUD();
-    }
-
-    function adjustDifficulty() {
-      if (score > highScore) {
-        highScore = score;
-        localStorage.setItem('cyber_snake_highscore', highScore);
-      }
-
-      // Gentle, gradual difficulty curve so player never feels overwhelmed
-      const newLevel = Math.min(8, Math.floor(score / 50) + 1);
-      if (newLevel !== speedLevel) {
-        speedLevel = newLevel;
-        gameSpeed = Math.max(90, 160 - (speedLevel - 1) * 9);
-      }
-    }
-
-    function updateHUD() {
-      scoreDisplay.textContent = String(score).padStart(4, '0');
-      highScoreDisplay.textContent = String(highScore).padStart(4, '0');
-      speedDisplay.textContent = `LVL ${String(speedLevel).padStart(2, '0')}`;
-    }
-
-    function triggerGameOver() {
-      isGameOver = true;
-      isGameRunning = false;
-      audio.crashSound();
-      triggerHaptic([60, 40, 90]);
-
-      finalScore.textContent = String(score).padStart(4, '0');
-      finalHigh.textContent = String(highScore).padStart(4, '0');
-      finalSpeed.textContent = `LVL ${String(speedLevel).padStart(2, '0')}`;
-
-      gameOverOverlay.classList.remove('opacity-0', 'pointer-events-none');
-    }
-
-    /* iPhone Haptic Trigger */
-    function triggerHaptic(pattern) {
-      if ('vibrate' in navigator) {
-        try {
-          navigator.vibrate(pattern);
-        } catch (e) {}
-      }
-    }
-
-    /* ==========================================================================
-       RENDERING PIPELINE
-       ========================================================================== */
-    function drawGrid(width, height) {
-      ctx.save();
-      // Glowing border indicates portal wrap-around active
-      if (warpMode) {
-        ctx.strokeStyle = 'rgba(5, 255, 161, 0.25)';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(1, 1, width - 2, height - 2);
-      }
-      ctx.strokeStyle = 'rgba(0, 243, 255, 0.06)';
-      ctx.lineWidth = 1;
-
-      for (let x = 0; x <= width; x += cellSize) {
+        // Cute soft pastel aura
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y <= height; y += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    function drawFood(time) {
-      const pulse = Math.sin(time * 0.008) * 0.2 + 0.8;
-      const x = food.x * cellSize + cellSize / 2;
-      const y = food.y * cellSize + cellSize / 2;
-      const radius = (cellSize / 2.5) * pulse;
-
-      ctx.save();
-      ctx.shadowColor = '#00f3ff';
-      ctx.shadowBlur = 16;
-
-      // Outer diamond halo
-      ctx.strokeStyle = '#00f3ff';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Glowing core
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(x, y, radius * 0.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-
-      // Bonus Cyber Energy Gem
-      if (bonusFood) {
-        const bx = bonusFood.x * cellSize + cellSize / 2;
-        const by = bonusFood.y * cellSize + cellSize / 2;
-        const bRadius = cellSize / 2.2;
-
-        ctx.save();
-        ctx.shadowColor = '#ff0055';
-        ctx.shadowBlur = 20;
-        ctx.fillStyle = '#ff0055';
-
-        // Draw rotating cyber gem
-        ctx.translate(bx, by);
-        ctx.rotate((time * 0.005) % (Math.PI * 2));
-        ctx.beginPath();
-        ctx.moveTo(0, -bRadius);
-        ctx.lineTo(bRadius, 0);
-        ctx.lineTo(0, bRadius);
-        ctx.lineTo(-bRadius, 0);
-        ctx.closePath();
+        ctx.arc(screenX, screenY + bounce, drawRadius * 1.35, 0, Math.PI * 2);
+        ctx.fillStyle = this.color + '40';
         ctx.fill();
 
+        // White pastry plate/glow base
+        ctx.beginPath();
+        ctx.arc(screenX, screenY + bounce, drawRadius, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(-bRadius * 0.25, -bRadius * 0.25, bRadius * 0.5, bRadius * 0.5);
-        ctx.restore();
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0; // reset
+
+        // Draw Dessert Icon / Emoji
+        ctx.font = `${Math.floor(drawRadius * 1.3)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.icon, screenX, screenY + bounce + 1);
+
+        // Tiny cute sparkle on top
+        if (Math.sin(this.pulse * 2) > 0.6) {
+          ctx.font = '9px sans-serif';
+          ctx.fillText('✨', screenX + drawRadius * 0.7, screenY - drawRadius * 0.5 + bounce);
+        }
       }
     }
 
-    function drawSnake() {
-      if (snake.length === 0) return;
+    /* ========================================================
+       CUTE KAWAII SNAKE CLASS
+       ======================================================== */
+    class CuteSnake {
+      constructor(x, y, name, isPlayer = false, colors = { primary: '#f472b6', secondary: '#fda4af', blush: '#fb7185', hat: '🍓' }) {
+        this.name = name;
+        this.isPlayer = isPlayer;
+        this.x = x;
+        this.y = y;
+        this.angle = Math.random() * Math.PI * 2;
+        this.targetAngle = this.angle;
+        this.turnRate = 0.088;
+        this.baseSpeed = BASE_SPEED;
+        this.boostSpeed = BOOST_SPEED;
+        this.isBoosting = false;
+        this.speed = this.baseSpeed;
+        this.radius = 14; // Round chubby body radius
+        this.length = INITIAL_SNAKE_LENGTH;
+        this.score = 100;
+        this.isDead = false;
 
-      ctx.save();
-      for (let i = snake.length - 1; i >= 0; i--) {
-        const seg = snake[i];
-        const px = seg.x * cellSize;
-        const py = seg.y * cellSize;
-        const isHead = i === 0;
+        this.colors = colors;
+        this.accessory = colors.hat || '🎀';
 
-        if (isHead) {
-          // Snake Head: prominent cyberpunk head with laser optic eye
-          ctx.shadowColor = '#00f3ff';
-          ctx.shadowBlur = 18;
-          ctx.fillStyle = '#00f3ff';
-          ctx.fillRect(px + 1, py + 1, cellSize - 2, cellSize - 2);
+        // Segments array storing vector points
+        this.segments = [];
+        for (let i = 0; i < this.length; i++) {
+          this.segments.push({
+            x: this.x - Math.cos(this.angle) * (i * SEGMENT_DISTANCE),
+            y: this.y - Math.sin(this.angle) * (i * SEGMENT_DISTANCE),
+            angle: this.angle
+          });
+        }
 
-          // Head inner chassis
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(px + 3, py + 3, cellSize - 6, cellSize - 6);
+        // Star & heart trail particles when rushing
+        this.sugarSparks = [];
 
-          // Bright directional scanner bar on front of snake head
-          ctx.fillStyle = '#ff0055';
-          ctx.shadowColor = '#ff0055';
-          ctx.shadowBlur = 12;
+        // Bot AI behavior
+        this.aiChangeTimer = 0;
+        this.aiTargetFood = null;
+      }
 
-          const barThickness = cellSize * 0.25;
-          if (direction.x === 1) {
-            ctx.fillRect(px + cellSize - barThickness, py + 2, barThickness, cellSize - 4);
-          } else if (direction.x === -1) {
-            ctx.fillRect(px, py + 2, barThickness, cellSize - 4);
-          } else if (direction.y === 1) {
-            ctx.fillRect(px + 2, py + cellSize - barThickness, cellSize - 4, barThickness);
+      update(foodList, allSnakes) {
+        if (this.isDead) return;
+
+        // Smooth 360-degree angle interpolation
+        let diff = normalizeAngle(this.targetAngle - this.angle);
+        this.angle += diff * this.turnRate;
+        this.angle = normalizeAngle(this.angle);
+
+        // Boost velocity & tiny treat dropping
+        if (this.isBoosting && this.length > 15) {
+          this.speed = lerp(this.speed, this.boostSpeed, 0.16);
+          // Drop sweet crumb when sprinting
+          if (Math.random() < 0.16) {
+            this.length = Math.max(15, this.length - 0.08);
+            this.score = Math.max(50, this.score - 0.5);
+            const tail = this.segments[this.segments.length - 1];
+            if (foodList.length < FOOD_COUNT + 100) {
+              foodList.push(new DessertFood(tail.x, tail.y, DESSERT_TYPES[8])); // Candy drop
+            }
+          }
+        } else {
+          this.isBoosting = false;
+          this.speed = lerp(this.speed, this.baseSpeed, 0.15);
+        }
+
+        // Advance head vector
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+
+        // Arena boundary soft spring
+        const distFromCenter = Math.hypot(this.x, this.y);
+        if (distFromCenter > WORLD_RADIUS - 35) {
+          const pushAngle = Math.atan2(-this.y, -this.x);
+          this.targetAngle = pushAngle;
+          if (distFromCenter > WORLD_RADIUS) {
+            this.x = (this.x / distFromCenter) * WORLD_RADIUS;
+            this.y = (this.y / distFromCenter) * WORLD_RADIUS;
+          }
+        }
+
+        // Inverse kinematics segment update
+        let leaderX = this.x;
+        let leaderY = this.y;
+
+        for (let i = 0; i < this.segments.length; i++) {
+          const seg = this.segments[i];
+          const dx = leaderX - seg.x;
+          const dy = leaderY - seg.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist > SEGMENT_DISTANCE) {
+            const segAngle = Math.atan2(dy, dx);
+            seg.x = leaderX - Math.cos(segAngle) * SEGMENT_DISTANCE;
+            seg.y = leaderY - Math.sin(segAngle) * SEGMENT_DISTANCE;
+            seg.angle = segAngle;
+          }
+
+          leaderX = seg.x;
+          leaderY = seg.y;
+        }
+
+        // Grow/Shrink segments
+        while (this.segments.length < Math.floor(this.length)) {
+          const last = this.segments[this.segments.length - 1];
+          this.segments.push({ x: last.x, y: last.y, angle: last.angle });
+        }
+        while (this.segments.length > Math.floor(this.length)) {
+          this.segments.pop();
+        }
+
+        // Sugar rush heart & sprinkle particles
+        if (this.isBoosting && Math.random() < 0.45) {
+          const tail = this.segments[this.segments.length - 1];
+          const icons = ['✨', '💖', '⭐', '🌸'];
+          this.sugarSparks.push({
+            x: tail.x + (Math.random() - 0.5) * 14,
+            y: tail.y + (Math.random() - 0.5) * 14,
+            icon: icons[Math.floor(Math.random() * icons.length)],
+            life: 1.0,
+            scale: 0.8 + Math.random() * 0.5
+          });
+        }
+
+        for (let i = this.sugarSparks.length - 1; i >= 0; i--) {
+          const spk = this.sugarSparks[i];
+          spk.life -= 0.05;
+          if (spk.life <= 0) this.sugarSparks.splice(i, 1);
+        }
+
+        // Bot AI behavior
+        if (!this.isPlayer) {
+          this.updateAI(foodList, allSnakes);
+        }
+      }
+
+      updateAI(foodList, allSnakes) {
+        this.aiChangeTimer--;
+
+        // Avoid enemy bodies
+        let dangerDetected = false;
+        const forwardProbeDist = 75;
+        const probeX = this.x + Math.cos(this.angle) * forwardProbeDist;
+        const probeY = this.y + Math.sin(this.angle) * forwardProbeDist;
+
+        for (let other of allSnakes) {
+          if (other === this || other.isDead) continue;
+          for (let k = 0; k < other.segments.length; k += 2) {
+            const seg = other.segments[k];
+            if (getDistance(probeX, probeY, seg.x, seg.y) < this.radius + other.radius + 22) {
+              dangerDetected = true;
+              const awayAngle = Math.atan2(this.y - seg.y, this.x - seg.x);
+              this.targetAngle = awayAngle + (Math.random() - 0.5) * 0.4;
+              break;
+            }
+          }
+          if (dangerDetected) break;
+        }
+
+        if (dangerDetected) {
+          this.aiChangeTimer = 16;
+          return;
+        }
+
+        // Head toward nearest sweet dessert
+        if (this.aiChangeTimer <= 0) {
+          this.aiChangeTimer = 45 + Math.floor(Math.random() * 40);
+
+          let closestDist = 480;
+          let bestSweet = null;
+          for (let f of foodList) {
+            const d = getDistance(this.x, this.y, f.x, f.y);
+            if (d < closestDist) {
+              closestDist = d;
+              bestSweet = f;
+            }
+          }
+
+          if (bestSweet) {
+            this.targetAngle = Math.atan2(bestSweet.y - this.y, bestSweet.x - this.x);
+            this.isBoosting = (bestSweet.value >= 3 && Math.random() < 0.4 && this.length > 25);
           } else {
-            ctx.fillRect(px + 2, py, cellSize - 4, barThickness);
+            const centerAngle = Math.atan2(-this.y, -this.x);
+            this.targetAngle = centerAngle + (Math.random() - 0.5) * 1.5;
+            this.isBoosting = false;
           }
-        } else {
-          // Snake Body: High contrast tech segments
-          const ratio = 1 - i / snake.length;
-          ctx.shadowColor = 'rgba(0, 243, 255, 0.45)';
-          ctx.shadowBlur = 8 * ratio;
-          ctx.fillStyle = `rgba(0, ${Math.floor(190 + 65 * ratio)}, ${Math.floor(220 + 35 * ratio)}, ${0.6 + 0.4 * ratio})`;
-          
-          const inset = 1.5;
-          ctx.fillRect(
-            px + inset,
-            py + inset,
-            cellSize - inset * 2,
-            cellSize - inset * 2
-          );
-
-          // Internal cyber-core node
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-          ctx.fillRect(px + cellSize * 0.32, py + cellSize * 0.32, cellSize * 0.36, cellSize * 0.36);
-        }
-      }
-      ctx.restore();
-    }
-
-    function render(currentTime) {
-      // Clear arena
-      const width = canvas.width / (window.devicePixelRatio || 1);
-      const height = canvas.height / (window.devicePixelRatio || 1);
-
-      ctx.clearRect(0, 0, width, height);
-
-      // Cyber Grid Backing
-      drawGrid(width, height);
-
-      // Food & Special Gems
-      drawFood(currentTime);
-
-      // Snake Body & Head
-      drawSnake();
-
-      // Render Particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.update();
-        p.draw(ctx);
-        if (p.alpha <= 0) {
-          particles.splice(i, 1);
         }
       }
 
-      // Step loop logic based on gameSpeed
-      if (currentTime - lastStepTime > gameSpeed) {
-        update();
-        lastStepTime = currentTime;
-      }
+      draw(ctx, camX, camY) {
+        if (this.isDead) return;
 
-      // FPS tracking
-      frameCount++;
-      if (currentTime - fpsTimer >= 1000) {
-        fpsCounter.textContent = Math.round((frameCount * 1000) / (currentTime - fpsTimer));
-        frameCount = 0;
-        fpsTimer = currentTime;
-      }
-
-      requestAnimationFrame(render);
-    }
-
-    /* ==========================================================================
-       USER INPUT HANDLING (Buffered & Safe for iPhone)
-       ========================================================================== */
-    function queueDirection(newDir) {
-      if (!isGameRunning || isPaused) return;
-
-      // Inspect latest planned direction (either in queue or active)
-      const lastPlanned = inputQueue.length > 0 ? inputQueue[inputQueue.length - 1] : direction;
-
-      // Disallow reversing into yourself or duplicate direction
-      if (newDir.x === lastPlanned.x && newDir.y === lastPlanned.y) return;
-      if (newDir.x !== 0 && lastPlanned.x === -newDir.x) return;
-      if (newDir.y !== 0 && lastPlanned.y === -newDir.y) return;
-
-      // Keep maximum 2 buffered inputs for immediate, snappy response
-      if (inputQueue.length < 2) {
-        inputQueue.push(newDir);
-        audio.moveSound();
-        triggerHaptic(12);
-      }
-    }
-
-    window.addEventListener('keydown', (e) => {
-      // Space to start / restart
-      if (e.code === 'Space') {
-        if (!isGameRunning && !isGameOver) {
-          startGame();
-          return;
+        // Sugar Rush Sprites
+        for (const spk of this.sugarSparks) {
+          const sx = spk.x - camX + screenWidth / 2;
+          const sy = spk.y - camY + screenHeight / 2;
+          ctx.font = `${Math.floor(14 * spk.scale)}px sans-serif`;
+          ctx.globalAlpha = Math.max(0, spk.life);
+          ctx.fillText(spk.icon, sx, sy);
+          ctx.globalAlpha = 1.0;
         }
-        if (isGameOver) {
-          restartGame();
-          return;
-        }
-      }
 
-      // Pause toggle
-      if (e.code === 'KeyP' && isGameRunning && !isGameOver) {
-        togglePause();
-        return;
-      }
+        // Draw Chubby Marshmallow Body Segments (Back to Front)
+        for (let i = this.segments.length - 1; i >= 0; i--) {
+          const seg = this.segments[i];
+          const sx = seg.x - camX + screenWidth / 2;
+          const sy = seg.y - camY + screenHeight / 2;
 
-      switch (e.code) {
-        case 'ArrowUp':
-        case 'KeyW':
-          e.preventDefault();
-          queueDirection({ x: 0, y: -1 });
-          break;
-        case 'ArrowDown':
-        case 'KeyS':
-          e.preventDefault();
-          queueDirection({ x: 0, y: 1 });
-          break;
-        case 'ArrowLeft':
-        case 'KeyA':
-          e.preventDefault();
-          queueDirection({ x: -1, y: 0 });
-          break;
-        case 'ArrowRight':
-        case 'KeyD':
-          e.preventDefault();
-          queueDirection({ x: 1, y: 0 });
-          break;
-      }
-    });
-
-    // iPhone Ergonomic Touch D-Pad listeners (both touchstart & click fallbacks)
-    const setupPadButton = (id, dir) => {
-      const el = document.getElementById(id);
-      const handler = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        queueDirection(dir);
-      };
-      el.addEventListener('touchstart', handler, { passive: false });
-      el.addEventListener('click', handler);
-    };
-
-    setupPadButton('btnUp', { x: 0, y: -1 });
-    setupPadButton('btnDown', { x: 0, y: 1 });
-    setupPadButton('btnLeft', { x: -1, y: 0 });
-    setupPadButton('btnRight', { x: 1, y: 0 });
-
-    // Smooth Full-Screen Swipe Support on the Canvas
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchStartTime = 0;
-
-    canvas.addEventListener('touchstart', (e) => {
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      touchStartTime = performance.now();
-    }, { passive: false });
-
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault(); // Prevent iOS bounce/pull-to-refresh
-    }, { passive: false });
-
-    canvas.addEventListener('touchend', (e) => {
-      if (!isGameRunning) return;
-      const touch = e.changedTouches[0];
-      const dx = touch.clientX - touchStartX;
-      const dy = touch.clientY - touchStartY;
-      const dt = performance.now() - touchStartTime;
-
-      const threshold = 18; // Low threshold for instant finger response
-      if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          queueDirection(dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
-        } else {
-          queueDirection(dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
-        }
-      }
-    }, { passive: false });
-
-    /* ==========================================================================
-       GAME FLOW & UI CONTROLS
-       ========================================================================== */
-    function startGame() {
-      audio.init();
-      initGame();
-      isGameRunning = true;
-      startOverlay.classList.add('opacity-0', 'pointer-events-none');
-      gameOverOverlay.classList.add('opacity-0', 'pointer-events-none');
-    }
-
-    function restartGame() {
-      startGame();
-    }
-
-    function togglePause() {
-      isPaused = !isPaused;
-      pauseOverlay.classList.toggle('hidden', !isPaused);
-    }
-
-    startGameBtn.addEventListener('click', startGame);
-    restartGameBtn.addEventListener('click', restartGame);
-
-    warpToggleBtn.addEventListener('click', () => {
-      warpMode = !warpMode;
-      warpLabel.textContent = warpMode ? 'ON' : 'OFF';
-      warpToggleBtn.classList.toggle('border-emerald-500/50', warpMode);
-      warpToggleBtn.classList.toggle('text-emerald-300', warpMode);
-      warpToggleBtn.classList.toggle('border-slate-600', !warpMode);
-      warpToggleBtn.classList.toggle('text-slate-400', !warpMode);
-      triggerHaptic(20);
-    });
-
-    soundToggleBtn.addEventListener('click', () => {
-      audio.muted = !audio.muted;
-      soundLabel.textContent = audio.muted ? 'SFX OFF' : 'SFX ON';
-      soundToggleBtn.classList.toggle('border-pink-500', audio.muted);
-      soundToggleBtn.classList.toggle('text-pink-400', audio.muted);
-      triggerHaptic(20);
-    });
-
-    /* ==========================================================================
-       OPENING CINEMATIC SEQUENCE (DIRECTED BY LUKE CHIU)
-       ========================================================================== */
-    function runOpeningCinematic() {
-      const originalText = "LUKE CHIU";
-      const glyphs = "01#@$%&*<>[]{}!/?";
-      let iteration = 0;
-      let introSkipped = false;
-
-      function closeIntro() {
-        if (introSkipped) return;
-        introSkipped = true;
-        introOverlay.style.opacity = '0';
-        setTimeout(() => {
-          introOverlay.style.display = 'none';
-        }, 700);
-      }
-
-      skipIntroBtn.addEventListener('click', () => {
-        audio.init();
-        audio.introBoopSound(660);
-        closeIntro();
-      });
-
-      // Terminal boot messages timeline
-      const statusLogs = [
-        "[CONNECTING TO MAINFRAME...]",
-        "[BYPASSING FIREWALL: LEVEL 4...]",
-        "[NEURAL SYNC LOCKED: 100%]",
-        "[DIRECTED & CODED BY LUKE CHIU]"
-      ];
-
-      statusLogs.forEach((msg, idx) => {
-        setTimeout(() => {
-          if (!introSkipped) {
-            introBootStatus.textContent = msg;
-            audio.introBoopSound(300 + idx * 120);
+          if (sx < -40 || sx > screenWidth + 40 || sy < -40 || sy > screenHeight + 40) {
+            continue;
           }
-        }, 500 + idx * 750);
-      });
 
-      // Hacker scramble decode effect on "LUKE CHIU"
-      const glitchInterval = setInterval(() => {
-        if (introSkipped) {
-          clearInterval(glitchInterval);
+          const taper = (i / this.segments.length);
+          const segRadius = Math.max(7, this.radius * (1 - taper * 0.35));
+          const segColor = (i % 3 === 0) ? this.colors.secondary : this.colors.primary;
+
+          // Cute soft outer shadow/frosting
+          ctx.beginPath();
+          ctx.arc(sx, sy, segRadius + 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffffbb';
+          ctx.fill();
+
+          // Body bead
+          ctx.beginPath();
+          ctx.arc(sx, sy, segRadius, 0, Math.PI * 2);
+          ctx.fillStyle = segColor;
+          ctx.fill();
+
+          // Sprinkle dots on random segments
+          if (i % 4 === 1) {
+            ctx.beginPath();
+            ctx.arc(sx - 3, sy - 2, 2.2, 0, Math.PI * 2);
+            ctx.fillStyle = '#fde047'; // yellow sprinkle
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(sx + 3, sy + 2, 1.8, 0, Math.PI * 2);
+            ctx.fillStyle = '#38bdf8'; // blue sprinkle
+            ctx.fill();
+          }
+
+          // Glossy highlight
+          ctx.beginPath();
+          ctx.arc(sx - segRadius * 0.3, sy - segRadius * 0.3, segRadius * 0.4, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+          ctx.fill();
+        }
+
+        // Draw Kawaii Head
+        const hx = this.x - camX + screenWidth / 2;
+        const hy = this.y - camY + screenHeight / 2;
+
+        // Head Outer Glow
+        ctx.beginPath();
+        ctx.arc(hx, hy, this.radius + 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // Head Base
+        ctx.beginPath();
+        ctx.arc(hx, hy, this.radius + 1, 0, Math.PI * 2);
+        ctx.fillStyle = this.colors.primary;
+        ctx.fill();
+
+        // Cute Anime Sparkling Eyes
+        const eyeOffsetDist = this.radius * 0.52;
+        const eyeAngleOffset = 0.75;
+        const eyeRadius = 4.8;
+
+        const leftEyeX = hx + Math.cos(this.angle - eyeAngleOffset) * eyeOffsetDist;
+        const leftEyeY = hy + Math.sin(this.angle - eyeAngleOffset) * eyeOffsetDist;
+        const rightEyeX = hx + Math.cos(this.angle + eyeAngleOffset) * eyeOffsetDist;
+        const rightEyeY = hy + Math.sin(this.angle + eyeAngleOffset) * eyeOffsetDist;
+
+        // Eye Backing (Dark anime eyes)
+        ctx.fillStyle = '#1e1b4b';
+        ctx.beginPath();
+        ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2);
+        ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye Big Shimmer / Star highlight
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(leftEyeX - 1.2, leftEyeY - 1.2, 2.2, 0, Math.PI * 2);
+        ctx.arc(rightEyeX - 1.2, rightEyeY - 1.2, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye Tiny secondary shimmer
+        ctx.beginPath();
+        ctx.arc(leftEyeX + 1.2, leftEyeY + 1.2, 1.1, 0, Math.PI * 2);
+        ctx.arc(rightEyeX + 1.2, rightEyeY + 1.2, 1.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute Anime Rosy Blush Cheeks (Blushing pink ovals)
+        const blushDist = this.radius * 0.85;
+        const blushAngleOffset = 1.15;
+        const leftBlushX = hx + Math.cos(this.angle - blushAngleOffset) * blushDist;
+        const leftBlushY = hy + Math.sin(this.angle - blushAngleOffset) * blushDist;
+        const rightBlushX = hx + Math.cos(this.angle + blushAngleOffset) * blushDist;
+        const rightBlushY = hy + Math.sin(this.angle + blushAngleOffset) * blushDist;
+
+        ctx.fillStyle = 'rgba(244, 63, 94, 0.55)';
+        ctx.beginPath();
+        ctx.ellipse(leftBlushX, leftBlushY, 3.8, 2.4, this.angle, 0, Math.PI * 2);
+        ctx.ellipse(rightBlushX, rightBlushY, 3.8, 2.4, this.angle, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute Little Smile / Nose
+        const snoutX = hx + Math.cos(this.angle) * (this.radius * 0.7);
+        const snoutY = hy + Math.sin(this.angle) * (this.radius * 0.7);
+        ctx.fillStyle = '#db2777';
+        ctx.beginPath();
+        ctx.arc(snoutX, snoutY, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute Hat / Accessory (Chef hat, strawberry, ribbon bow)
+        const hatX = hx - Math.cos(this.angle) * (this.radius * 0.4);
+        const hatY = hy - Math.sin(this.angle) * (this.radius * 0.4) - 9;
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.accessory, hatX, hatY);
+
+        // Cute Name Tag with heart
+        ctx.font = 'bold 12px Fredoka, sans-serif';
+        ctx.fillStyle = this.isPlayer ? '#db2777' : '#7c3aed';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${this.name}`, hx, hy - this.radius - 16);
+      }
+    }
+
+    /* ========================================================
+       GAME ENGINE & ARENA LOGIC
+       ======================================================== */
+    class GameEngine {
+      constructor() {
+        this.camera = { x: 0, y: 0 };
+        this.snakes = [];
+        this.food = [];
+        this.player = null;
+        this.isRunning = false;
+        this.isGameOver = false;
+        this.kills = 0;
+
+        // Input Tracking
+        this.keys = {
+          ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false,
+          KeyW: false, KeyS: false, KeyA: false, KeyD: false,
+          Space: false
+        };
+
+        this.mousePos = { x: screenWidth / 2, y: screenHeight / 2 };
+        this.useMouseSteering = false;
+
+        this.joystickActive = false;
+        this.joystickVector = { x: 0, y: 0 };
+
+        this.initControls();
+      }
+
+      initControls() {
+        window.addEventListener('keydown', (e) => {
+          if (this.keys.hasOwnProperty(e.code)) {
+            this.keys[e.code] = true;
+            this.useMouseSteering = false;
+          }
+          if (e.code === 'Space' && this.player) {
+            this.player.isBoosting = true;
+          }
+        });
+
+        window.addEventListener('keyup', (e) => {
+          if (this.keys.hasOwnProperty(e.code)) {
+            this.keys[e.code] = false;
+          }
+          if (e.code === 'Space' && this.player) {
+            this.player.isBoosting = false;
+          }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+          this.mousePos.x = e.clientX;
+          this.mousePos.y = e.clientY;
+          if (!this.joystickActive && this.isRunning) {
+            this.useMouseSteering = true;
+          }
+        });
+
+        window.addEventListener('mousedown', (e) => {
+          if (e.target.closest('#hudLayer') && !e.target.closest('#gameCanvas')) return;
+          if (this.player && this.isRunning) {
+            this.player.isBoosting = true;
+          }
+        });
+
+        window.addEventListener('mouseup', () => {
+          if (this.player) {
+            this.player.isBoosting = false;
+          }
+        });
+
+        // Joystick Handling
+        const handleJoystickMove = (clientX, clientY) => {
+          const rect = joystickZone.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const maxDist = rect.width / 2 - 10;
+
+          const dx = clientX - centerX;
+          const dy = clientY - centerY;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist > 0) {
+            const angle = Math.atan2(dy, dx);
+            const clampedDist = Math.min(dist, maxDist);
+            const knobX = Math.cos(angle) * clampedDist;
+            const knobY = Math.sin(angle) * clampedDist;
+
+            joystickKnob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+            this.joystickVector = { x: Math.cos(angle), y: Math.sin(angle) };
+            this.joystickActive = true;
+            this.useMouseSteering = false;
+
+            if (this.player) {
+              this.player.targetAngle = angle;
+            }
+          }
+        };
+
+        const resetJoystick = () => {
+          this.joystickActive = false;
+          this.joystickVector = { x: 0, y: 0 };
+          joystickKnob.style.transform = `translate(0px, 0px)`;
+        };
+
+        joystickZone.addEventListener('pointerdown', (e) => {
+          joystickZone.setPointerCapture(e.pointerId);
+          this.joystickActive = true;
+          handleJoystickMove(e.clientX, e.clientY);
+        });
+
+        joystickZone.addEventListener('pointermove', (e) => {
+          if (this.joystickActive) {
+            handleJoystickMove(e.clientX, e.clientY);
+          }
+        });
+
+        joystickZone.addEventListener('pointerup', resetJoystick);
+        joystickZone.addEventListener('pointercancel', resetJoystick);
+
+        // Boost / Sugar Rush Button
+        boostBtn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          if (this.player) this.player.isBoosting = true;
+        });
+
+        boostBtn.addEventListener('pointerup', (e) => {
+          e.preventDefault();
+          if (this.player) this.player.isBoosting = false;
+        });
+
+        boostBtn.addEventListener('pointerleave', () => {
+          if (this.player) this.player.isBoosting = false;
+        });
+      }
+
+      spawnPlayer() {
+        // Player: Luke Chiu's sweetie snake with a strawberry hat
+        this.player = new CuteSnake(0, 0, 'Luke Chiu 💕', true, {
+          primary: '#f472b6',
+          secondary: '#fda4af',
+          blush: '#fb7185',
+          hat: '🍓'
+        });
+        this.snakes = [this.player];
+        this.kills = 0;
+        this.isGameOver = false;
+
+        // Cute bot names & themes
+        const botThemes = [
+          { name: 'Mochi Roll', primary: '#a78bfa', secondary: '#c4b5fd', hat: '🎀' },
+          { name: 'Pudding Pop', primary: '#facc15', secondary: '#fef08a', hat: '🍮' },
+          { name: 'Boba Bear', primary: '#fb923c', secondary: '#fdba74', hat: '🧋' },
+          { name: 'Berry Bunny', primary: '#f43f5e', secondary: '#fda4af', hat: '🍒' },
+          { name: 'Mint Macaron', primary: '#34d399', secondary: '#a7f3d0', hat: '🍪' },
+          { name: 'Sugar Fluff', primary: '#38bdf8', secondary: '#bae6fd', hat: '🧁' },
+          { name: 'Honey Glaze', primary: '#fbbf24', secondary: '#fde68a', hat: '🍯' },
+          { name: 'Cotton Candy', primary: '#ec4899', secondary: '#fbcfe8', hat: '🍬' },
+          { name: 'Choco Puff', primary: '#b45309', secondary: '#fcd34d', hat: '🍫' },
+          { name: 'Peach Tart', primary: '#fb7185', secondary: '#fecdd3', hat: '🍑' },
+          { name: 'Matcha Swirl', primary: '#4ade80', secondary: '#bbf7d0', hat: '🍵' },
+          { name: 'Vanilla Bean', primary: '#e2e8f0', secondary: '#f8fafc', hat: '🍦' }
+        ];
+
+        for (let i = 0; i < BOT_COUNT; i++) {
+          const spawnAngle = Math.random() * Math.PI * 2;
+          const spawnDist = 350 + Math.random() * (WORLD_RADIUS - 550);
+          const bx = Math.cos(spawnAngle) * spawnDist;
+          const by = Math.sin(spawnAngle) * spawnDist;
+          const theme = botThemes[i % botThemes.length];
+          const bot = new CuteSnake(bx, by, theme.name, false, theme);
+          bot.length = 20 + Math.floor(Math.random() * 30);
+          bot.score = Math.floor(bot.length * 4);
+          this.snakes.push(bot);
+        }
+
+        // Spawn Desserts
+        this.food = [];
+        for (let i = 0; i < FOOD_COUNT; i++) {
+          const fAngle = Math.random() * Math.PI * 2;
+          const fDist = Math.random() * (WORLD_RADIUS - 60);
+          this.food.push(new DessertFood(Math.cos(fAngle) * fDist, Math.sin(fAngle) * fDist));
+        }
+      }
+
+      spawnReplacementBot() {
+        const botThemes = [
+          { name: 'Sprinkle Worm', primary: '#f472b6', secondary: '#fed7aa', hat: '🍩' },
+          { name: 'Gummy Jelly', primary: '#2dd4bf', secondary: '#99f6e4', hat: '🧸' },
+          { name: 'Tiramisu', primary: '#d97706', secondary: '#fde68a', hat: '☕' },
+          { name: 'Strawberry Milk', primary: '#f43f5e', secondary: '#ffe4e6', hat: '🥛' }
+        ];
+        const spawnAngle = Math.random() * Math.PI * 2;
+        const spawnDist = WORLD_RADIUS - 160;
+        const bx = Math.cos(spawnAngle) * spawnDist;
+        const by = Math.sin(spawnAngle) * spawnDist;
+        const theme = botThemes[Math.floor(Math.random() * botThemes.length)];
+        const bot = new CuteSnake(bx, by, theme.name, false, theme);
+        bot.length = 18 + Math.floor(Math.random() * 22);
+        this.snakes.push(bot);
+      }
+
+      handlePlayerInput() {
+        if (!this.player || this.player.isDead) return;
+
+        if (this.joystickActive) return;
+
+        let keyTurn = 0;
+        if (this.keys.ArrowLeft || this.keys.KeyA) keyTurn -= 1;
+        if (this.keys.ArrowRight || this.keys.KeyD) keyTurn += 1;
+
+        if (keyTurn !== 0) {
+          this.player.targetAngle += keyTurn * 0.088;
+          this.useMouseSteering = false;
           return;
         }
 
-        introCreatorName.innerText = originalText
-          .split("")
-          .map((letter, index) => {
-            if (index < iteration) return originalText[index];
-            return glyphs[Math.floor(Math.random() * glyphs.length)];
-          })
-          .join("");
-
-        if (iteration >= originalText.length) {
-          clearInterval(glitchInterval);
-          audio.introBoomSound();
+        if (this.useMouseSteering) {
+          const screenCenterX = screenWidth / 2;
+          const screenCenterY = screenHeight / 2;
+          const mdx = this.mousePos.x - screenCenterX;
+          const mdy = this.mousePos.y - screenCenterY;
+          if (Math.hypot(mdx, mdy) > 15) {
+            this.player.targetAngle = Math.atan2(mdy, mdx);
+          }
         }
-        iteration += 1 / 3;
-      }, 55);
+      }
 
-      // Auto dismiss after cinematic concludes
-      setTimeout(() => {
-        closeIntro();
-      }, 4000);
+      killSnake(snake, reason = 'Bumped into an enemy sweetie') {
+        if (snake.isDead) return;
+        snake.isDead = true;
+
+        // Explode into a shower of delicious cakes and candies!
+        for (let i = 0; i < snake.segments.length; i += 2) {
+          const seg = snake.segments[i];
+          const dessert = DESSERT_TYPES[Math.floor(Math.random() * DESSERT_TYPES.length)];
+          this.food.push(new DessertFood(
+            seg.x + (Math.random() - 0.5) * 20,
+            seg.y + (Math.random() - 0.5) * 20,
+            dessert
+          ));
+        }
+
+        if (snake === this.player) {
+          playKillSound();
+          this.triggerGameOver(reason);
+        } else {
+          if (this.player && !this.player.isDead) {
+            for (let seg of this.player.segments) {
+              if (getDistance(snake.x, snake.y, seg.x, seg.y) < snake.radius + this.player.radius + 15) {
+                this.kills++;
+                break;
+              }
+            }
+          }
+          setTimeout(() => {
+            if (this.isRunning) this.spawnReplacementBot();
+          }, 2400);
+        }
+      }
+
+      triggerGameOver(reason) {
+        this.isGameOver = true;
+        deathCause.innerText = reason;
+        finalScoreVal.innerText = Math.floor(this.player ? this.player.score : 0);
+        finalKillsVal.innerText = this.kills;
+        gameOverScreen.classList.remove('hidden');
+      }
+
+      update() {
+        if (!this.isRunning) return;
+
+        this.handlePlayerInput();
+
+        // Update snakes
+        for (let i = this.snakes.length - 1; i >= 0; i--) {
+          const s = this.snakes[i];
+          s.update(this.food, this.snakes);
+          if (s.isDead) {
+            this.snakes.splice(i, 1);
+          }
+        }
+
+        // Camera follow player
+        if (this.player && !this.player.isDead) {
+          this.camera.x = lerp(this.camera.x, this.player.x, 0.12);
+          this.camera.y = lerp(this.camera.y, this.player.y, 0.12);
+        }
+
+        // Eat Desserts Collision Check
+        for (let snake of this.snakes) {
+          if (snake.isDead) continue;
+          for (let fIdx = this.food.length - 1; fIdx >= 0; fIdx--) {
+            const f = this.food[fIdx];
+            const dist = getDistance(snake.x, snake.y, f.x, f.y);
+            if (dist < snake.radius + f.baseRadius + 6) {
+              snake.length += f.value * 0.45;
+              snake.score += Math.round(f.value * 12);
+              this.food.splice(fIdx, 1);
+
+              if (snake.isPlayer) {
+                playEatSound();
+              }
+            }
+          }
+        }
+
+        // Replenish ambient sweets
+        while (this.food.length < FOOD_COUNT) {
+          const fAngle = Math.random() * Math.PI * 2;
+          const fDist = Math.random() * (WORLD_RADIUS - 50);
+          this.food.push(new DessertFood(Math.cos(fAngle) * fDist, Math.sin(fAngle) * fDist));
+        }
+
+        // ========================================================
+        // SAFE SELF-COLLISION & SLITHER COMBAT
+        // (You CANNOT die touching yourself!)
+        // ========================================================
+        for (let attacker of this.snakes) {
+          if (attacker.isDead) continue;
+
+          for (let target of this.snakes) {
+            if (target === attacker || target.isDead) {
+              // NO SELF-COLLISION! Slither & coil freely over own body!
+              continue;
+            }
+
+            for (let segIdx = 0; segIdx < target.segments.length; segIdx++) {
+              const seg = target.segments[segIdx];
+              const collisionDist = getDistance(attacker.x, attacker.y, seg.x, seg.y);
+
+              if (collisionDist < attacker.radius + target.radius * 0.8) {
+                const reason = attacker.isPlayer
+                  ? `Bumped into ${target.name}'s tail frosting!`
+                  : `Collided with ${target.name}`;
+                this.killSnake(attacker, reason);
+                break;
+              }
+            }
+            if (attacker.isDead) break;
+          }
+        }
+
+        // Update HUD
+        if (this.player) {
+          scoreVal.innerText = Math.floor(this.player.score);
+          lengthVal.innerText = Math.floor(this.player.length);
+          enemiesCountVal.innerText = this.snakes.filter(s => !s.isPlayer && !s.isDead).length;
+        }
+
+        this.updateLeaderboard();
+      }
+
+      updateLeaderboard() {
+        const sorted = [...this.snakes].sort((a, b) => b.score - a.score).slice(0, 5);
+        leaderboardList.innerHTML = '';
+        sorted.forEach((snake, idx) => {
+          const li = document.createElement('li');
+          li.className = 'flex justify-between items-center ' + (snake.isPlayer ? 'text-pink-600 font-extrabold' : 'text-slate-600 font-medium');
+          li.innerHTML = `
+            <span class="truncate max-w-[100px]">${idx + 1}. ${snake.name}</span>
+            <span class="text-right text-pink-500 font-mono font-bold">${Math.floor(snake.score)}</span>
+          `;
+          leaderboardList.appendChild(li);
+        });
+      }
+
+      drawWaffleGrid(camX, camY) {
+        // Cute Pastel Waffle / Sprinkle Grid Background
+        const gridSize = 72;
+        const offsetX = (screenWidth / 2 - camX) % gridSize;
+        const offsetY = (screenHeight / 2 - camY) % gridSize;
+
+        ctx.strokeStyle = 'rgba(251, 207, 232, 0.45)'; // soft pink grid lines
+        ctx.lineWidth = 1.5;
+
+        ctx.beginPath();
+        for (let x = offsetX; x < screenWidth; x += gridSize) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, screenHeight);
+        }
+        for (let y = offsetY; y < screenHeight; y += gridSize) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(screenWidth, y);
+        }
+        ctx.stroke();
+
+        // Arena Circular Candy Cane / Biscuit Border
+        const boundaryScreenX = 0 - camX + screenWidth / 2;
+        const boundaryScreenY = 0 - camY + screenHeight / 2;
+
+        // Thick Candy Icing Ring
+        ctx.beginPath();
+        ctx.arc(boundaryScreenX, boundaryScreenY, WORLD_RADIUS, 0, Math.PI * 2);
+        ctx.strokeStyle = '#f472b6';
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        // Inner Sprinkle Ring
+        ctx.beginPath();
+        ctx.arc(boundaryScreenX, boundaryScreenY, WORLD_RADIUS, 0, Math.PI * 2);
+        ctx.strokeStyle = '#ffffff';
+        ctx.setLineDash([16, 16]);
+        ctx.lineWidth = 6;
+        ctx.stroke();
+        ctx.setLineDash([]); // reset
+      }
+
+      drawMinimap() {
+        minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+        const mapW = minimapCanvas.width;
+        const mapH = minimapCanvas.height;
+        const scale = mapW / (WORLD_RADIUS * 2.2);
+
+        const centerX = mapW / 2;
+        const centerY = mapH / 2;
+
+        // Boundary
+        minimapCtx.beginPath();
+        minimapCtx.arc(centerX, centerY, WORLD_RADIUS * scale, 0, Math.PI * 2);
+        minimapCtx.strokeStyle = '#f472b6';
+        minimapCtx.lineWidth = 2.5;
+        minimapCtx.stroke();
+
+        // Mini Desserts (little dots)
+        minimapCtx.fillStyle = '#fbcfe8';
+        for (let i = 0; i < this.food.length; i += 7) {
+          const f = this.food[i];
+          const mx = centerX + f.x * scale;
+          const my = centerY + f.y * scale;
+          minimapCtx.fillRect(mx, my, 1.5, 1.5);
+        }
+
+        // Enemy Snakes
+        for (let s of this.snakes) {
+          if (s.isDead || s.isPlayer) continue;
+          const sx = centerX + s.x * scale;
+          const sy = centerY + s.y * scale;
+          minimapCtx.beginPath();
+          minimapCtx.arc(sx, sy, 2.5, 0, Math.PI * 2);
+          minimapCtx.fillStyle = '#a855f7';
+          minimapCtx.fill();
+        }
+
+        // Player marker with heart
+        if (this.player && !this.player.isDead) {
+          const px = centerX + this.player.x * scale;
+          const py = centerY + this.player.y * scale;
+
+          minimapCtx.beginPath();
+          minimapCtx.arc(px, py, 4.5, 0, Math.PI * 2);
+          minimapCtx.fillStyle = '#ec4899';
+          minimapCtx.fill();
+
+          // Heading direction line
+          minimapCtx.beginPath();
+          minimapCtx.moveTo(px, py);
+          minimapCtx.lineTo(px + Math.cos(this.player.angle) * 8, py + Math.sin(this.player.angle) * 8);
+          minimapCtx.strokeStyle = '#ffffff';
+          minimapCtx.lineWidth = 2;
+          minimapCtx.stroke();
+        }
+      }
+
+      render() {
+        // Pastel Cream Canvas Background
+        ctx.fillStyle = '#fff4f7';
+        ctx.fillRect(0, 0, screenWidth, screenHeight);
+
+        const camX = this.camera.x;
+        const camY = this.camera.y;
+
+        // 1. Draw Waffle Arena
+        this.drawWaffleGrid(camX, camY);
+
+        // 2. Draw Desserts
+        for (let f of this.food) {
+          f.update();
+          f.draw(ctx, camX, camY);
+        }
+
+        // 3. Draw Kawaii Snakes
+        for (let snake of this.snakes) {
+          snake.draw(ctx, camX, camY);
+        }
+
+        // 4. Draw Mini-map
+        this.drawMinimap();
+      }
+
+      start() {
+        initAudio();
+        this.spawnPlayer();
+        this.isRunning = true;
+        introScreen.classList.add('hidden');
+        gameOverScreen.classList.add('hidden');
+        hudLayer.classList.remove('hidden');
+        minimapContainer.classList.remove('hidden');
+      }
+
+      restart() {
+        this.spawnPlayer();
+        gameOverScreen.classList.add('hidden');
+      }
     }
 
-    // Run game on load
+    /* ========================================================
+       BOOTSTRAP & LOOP
+       ======================================================== */
+    let game;
+
     window.onload = function () {
-      highScoreDisplay.textContent = String(highScore).padStart(4, '0');
-      resizeCanvas();
-      runOpeningCinematic();
-      requestAnimationFrame(render);
+      game = new GameEngine();
+
+      startBtn.addEventListener('click', () => {
+        game.start();
+      });
+
+      respawnBtn.addEventListener('click', () => {
+        game.restart();
+      });
+
+      function gameLoop() {
+        try {
+          game.update();
+          game.render();
+        } catch (e) {
+          console.error("Game loop error: ", e);
+        }
+        requestAnimationFrame(gameLoop);
+      }
+
+      requestAnimationFrame(gameLoop);
     };
   </script>
 </body>
