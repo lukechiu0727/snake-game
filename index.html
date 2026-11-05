@@ -111,16 +111,17 @@
       border-right: 2px solid var(--neon-cyan);
     }
 
-    /* Touch Control Buttons */
+    /* Touch Control Buttons with tactile feedback */
     .d-pad-btn {
       touch-action: manipulation;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
       -webkit-tap-highlight-color: transparent;
+      transition: transform 0.08s ease, background-color 0.1s ease, box-shadow 0.1s ease;
     }
     .d-pad-btn:active {
-      background-color: rgba(0, 243, 255, 0.4);
-      transform: scale(0.92);
-      box-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+      background-color: rgba(0, 243, 255, 0.45);
+      transform: scale(0.90);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.8), inset 0 0 10px rgba(0, 243, 255, 0.4);
     }
 
     /* Cyber Cinematic Intro Animations */
@@ -218,8 +219,12 @@
       
       <!-- Audio toggle & Info icon -->
       <div class="flex items-center space-x-2">
-        <button id="soundToggleBtn" class="text-xs uppercase tracking-wider px-2 py-1 rounded bg-slate-900/80 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 transition-all flex items-center gap-1 active:scale-95">
-          <svg id="soundIconOn" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button id="warpToggleBtn" class="text-[11px] uppercase tracking-wider px-2 py-1 rounded bg-slate-900/80 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 transition-all flex items-center gap-1 active:scale-95">
+          <span>PORTAL:</span>
+          <span id="warpLabel" class="font-bold">ON</span>
+        </button>
+        <button id="soundToggleBtn" class="text-[11px] uppercase tracking-wider px-2 py-1 rounded bg-slate-900/80 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 transition-all flex items-center gap-1 active:scale-95">
+          <svg id="soundIconOn" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
           </svg>
           <span id="soundLabel">SFX</span>
@@ -256,10 +261,10 @@
           ★ CREATED BY LUKE CHIU ★
         </div>
         <h2 class="text-2xl sm:text-3xl font-cyber font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-pink-400 to-amber-300 mb-1">
-          READY RUNNER?
+          EASY PLAY MODE
         </h2>
         <p class="text-xs text-slate-300 max-w-xs mb-4 font-medium">
-          Swipe directly on the screen or use the neon controller below.
+          Swipe anywhere on screen or tap the thumb pad. Wall portal mode prevents instant crashes!
         </p>
         <button id="startGameBtn" class="neon-button px-7 py-2.5 bg-cyan-500 hover:bg-cyan-400 active:scale-95 text-slate-950 font-cyber font-bold tracking-widest text-xs rounded shadow-lg shadow-cyan-500/50 uppercase cursor-pointer">
           START RUN
@@ -303,25 +308,25 @@
 
   <!-- Mobile / Touch Controls D-Pad (Refined ergonomic iPhone layout) -->
   <div class="w-full max-w-xs flex flex-col items-center z-10 shrink-0 mb-1">
-    <button id="btnUp" class="d-pad-btn w-14 h-12 mb-1.5 flex items-center justify-center rounded-xl bg-slate-900/90 border border-cyan-500/50 text-cyan-300 shadow-md">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+    <button id="btnUp" class="d-pad-btn w-16 h-13 sm:w-16 sm:h-12 mb-1.5 flex items-center justify-center rounded-2xl bg-slate-900/90 border-2 border-cyan-400/60 text-cyan-300 shadow-[0_0_12px_rgba(0,243,255,0.25)] active:bg-cyan-400/40">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M5 15l7-7 7 7" />
       </svg>
     </button>
-    <div class="flex justify-between w-48">
-      <button id="btnLeft" class="d-pad-btn w-14 h-12 flex items-center justify-center rounded-xl bg-slate-900/90 border border-cyan-500/50 text-cyan-300 shadow-md">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+    <div class="flex justify-between w-56 sm:w-52">
+      <button id="btnLeft" class="d-pad-btn w-16 h-13 sm:w-16 sm:h-12 flex items-center justify-center rounded-2xl bg-slate-900/90 border-2 border-cyan-400/60 text-cyan-300 shadow-[0_0_12px_rgba(0,243,255,0.25)] active:bg-cyan-400/40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
-      <button id="btnDown" class="d-pad-btn w-14 h-12 flex items-center justify-center rounded-xl bg-slate-900/90 border border-cyan-500/50 text-cyan-300 shadow-md">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+      <button id="btnDown" class="d-pad-btn w-16 h-13 sm:w-16 sm:h-12 flex items-center justify-center rounded-2xl bg-slate-900/90 border-2 border-cyan-400/60 text-cyan-300 shadow-[0_0_12px_rgba(0,243,255,0.25)] active:bg-cyan-400/40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      <button id="btnRight" class="d-pad-btn w-14 h-12 flex items-center justify-center rounded-xl bg-slate-900/90 border border-cyan-500/50 text-cyan-300 shadow-md">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+      <button id="btnRight" class="d-pad-btn w-16 h-13 sm:w-16 sm:h-12 flex items-center justify-center rounded-2xl bg-slate-900/90 border-2 border-cyan-400/60 text-cyan-300 shadow-[0_0_12px_rgba(0,243,255,0.25)] active:bg-cyan-400/40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M9 5l7 7-7 7" />
         </svg>
       </button>
     </div>
@@ -500,6 +505,8 @@
     const restartGameBtn = document.getElementById('restartGameBtn');
     const soundToggleBtn = document.getElementById('soundToggleBtn');
     const soundLabel = document.getElementById('soundLabel');
+    const warpToggleBtn = document.getElementById('warpToggleBtn');
+    const warpLabel = document.getElementById('warpLabel');
     const introOverlay = document.getElementById('introOverlay');
     const introBootStatus = document.getElementById('introBootStatus');
     const introCreatorName = document.getElementById('introCreatorName');
@@ -509,21 +516,22 @@
     const finalSpeed = document.getElementById('finalSpeed');
     const fpsCounter = document.getElementById('fpsCounter');
 
-    // Grid configuration
-    const GRID_SIZE = 22; // 22x22 grid
+    // Easier grid configuration: 18x18 for larger targets and clearer visuals
+    const GRID_SIZE = 18;
     let cellSize = 0;
 
     // Game variables
     let snake = [];
     let direction = { x: 1, y: 0 };
-    let nextDirection = { x: 1, y: 0 };
-    let food = { x: 15, y: 11, type: 'regular' };
+    let inputQueue = []; // Buffered inputs prevent missing turns and accidental reverse deaths
+    let food = { x: 12, y: 9, type: 'regular' };
     let bonusFood = null;
     let bonusTimer = 0;
     let score = 0;
     let highScore = localStorage.getItem('cyber_snake_highscore') || 0;
     let speedLevel = 1;
-    let gameSpeed = 120; // milliseconds per step
+    let gameSpeed = 160; // Much gentler initial speed (160ms vs 120ms)
+    let warpMode = true; // Portal wrap-around enabled by default for easy play
     let lastStepTime = 0;
     let isGameOver = false;
     let isGameRunning = false;
@@ -602,15 +610,15 @@
        ========================================================================== */
     function initGame() {
       snake = [
-        { x: 5, y: 10 },
-        { x: 4, y: 10 },
-        { x: 3, y: 10 }
+        { x: 5, y: 9 },
+        { x: 4, y: 9 },
+        { x: 3, y: 9 }
       ];
       direction = { x: 1, y: 0 };
-      nextDirection = { x: 1, y: 0 };
+      inputQueue = [];
       score = 0;
       speedLevel = 1;
-      gameSpeed = 120;
+      gameSpeed = 160; // Slower and relaxed starting speed
       isGameOver = false;
       isPaused = false;
       particles = [];
@@ -634,8 +642,8 @@
         }
       }
 
-      // Chance to spawn special temporary Cyber Gem
-      if (Math.random() < 0.25 && !bonusFood) {
+      // Bonus food spawn
+      if (Math.random() < 0.3 && !bonusFood) {
         spawnBonusFood();
       }
     }
@@ -647,7 +655,7 @@
         const ny = Math.floor(Math.random() * GRID_SIZE);
         const collision = snake.some(s => s.x === nx && s.y === ny) || (food.x === nx && food.y === ny);
         if (!collision) {
-          bonusFood = { x: nx, y: ny, timer: 65 }; // lasts 65 ticks
+          bonusFood = { x: nx, y: ny, timer: 75 }; // generous 75-tick window
           valid = true;
         }
       }
@@ -656,21 +664,38 @@
     function update() {
       if (!isGameRunning || isGameOver || isPaused) return;
 
-      direction = { ...nextDirection };
-
-      const head = {
-        x: snake[0].x + direction.x,
-        y: snake[0].y + direction.y
-      };
-
-      // Wall Collision Check
-      if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
-        triggerGameOver();
-        return;
+      // Process next queued command safely
+      if (inputQueue.length > 0) {
+        const nextDir = inputQueue.shift();
+        // Disallow immediate 180 reverse against current motion
+        if (!(nextDir.x !== 0 && direction.x === -nextDir.x) &&
+            !(nextDir.y !== 0 && direction.y === -nextDir.y)) {
+          direction = nextDir;
+        }
       }
 
-      // Self Collision Check
-      if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+      let nextX = snake[0].x + direction.x;
+      let nextY = snake[0].y + direction.y;
+
+      // Wrap-around portals (easy mode) vs strict walls
+      if (warpMode) {
+        if (nextX < 0) nextX = GRID_SIZE - 1;
+        else if (nextX >= GRID_SIZE) nextX = 0;
+
+        if (nextY < 0) nextY = GRID_SIZE - 1;
+        else if (nextY >= GRID_SIZE) nextY = 0;
+      } else {
+        if (nextX < 0 || nextX >= GRID_SIZE || nextY < 0 || nextY >= GRID_SIZE) {
+          triggerGameOver();
+          return;
+        }
+      }
+
+      const head = { x: nextX, y: nextY };
+
+      // Self Collision Check (ignore tail end since it moves on this tick)
+      const hitSelf = snake.slice(0, -1).some(seg => seg.x === head.x && seg.y === head.y);
+      if (hitSelf) {
         triggerGameOver();
         return;
       }
@@ -681,6 +706,7 @@
       if (head.x === food.x && head.y === food.y) {
         score += 10;
         audio.eatFoodSound();
+        triggerHaptic(25);
         spawnFoodParticles(food.x, food.y, '#00f3ff');
         adjustDifficulty();
         spawnFood();
@@ -689,6 +715,7 @@
       else if (bonusFood && head.x === bonusFood.x && head.y === bonusFood.y) {
         score += 35;
         audio.bonusFoodSound();
+        triggerHaptic([35, 40, 35]);
         spawnFoodParticles(bonusFood.x, bonusFood.y, '#ff0055');
         bonusFood = null;
         adjustDifficulty();
@@ -713,11 +740,11 @@
         localStorage.setItem('cyber_snake_highscore', highScore);
       }
 
-      // Dynamic speed scaling
-      const newLevel = Math.min(10, Math.floor(score / 40) + 1);
+      // Gentle, gradual difficulty curve so player never feels overwhelmed
+      const newLevel = Math.min(8, Math.floor(score / 50) + 1);
       if (newLevel !== speedLevel) {
         speedLevel = newLevel;
-        gameSpeed = Math.max(50, 120 - (speedLevel - 1) * 7.5);
+        gameSpeed = Math.max(90, 160 - (speedLevel - 1) * 9);
       }
     }
 
@@ -731,6 +758,7 @@
       isGameOver = true;
       isGameRunning = false;
       audio.crashSound();
+      triggerHaptic([60, 40, 90]);
 
       finalScore.textContent = String(score).padStart(4, '0');
       finalHigh.textContent = String(highScore).padStart(4, '0');
@@ -739,12 +767,27 @@
       gameOverOverlay.classList.remove('opacity-0', 'pointer-events-none');
     }
 
+    /* iPhone Haptic Trigger */
+    function triggerHaptic(pattern) {
+      if ('vibrate' in navigator) {
+        try {
+          navigator.vibrate(pattern);
+        } catch (e) {}
+      }
+    }
+
     /* ==========================================================================
        RENDERING PIPELINE
        ========================================================================== */
     function drawGrid(width, height) {
       ctx.save();
-      ctx.strokeStyle = 'rgba(0, 243, 255, 0.05)';
+      // Glowing border indicates portal wrap-around active
+      if (warpMode) {
+        ctx.strokeStyle = 'rgba(5, 255, 161, 0.25)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, width - 2, height - 2);
+      }
+      ctx.strokeStyle = 'rgba(0, 243, 255, 0.06)';
       ctx.lineWidth = 1;
 
       for (let x = 0; x <= width; x += cellSize) {
@@ -766,15 +809,15 @@
       const pulse = Math.sin(time * 0.008) * 0.2 + 0.8;
       const x = food.x * cellSize + cellSize / 2;
       const y = food.y * cellSize + cellSize / 2;
-      const radius = (cellSize / 2.8) * pulse;
+      const radius = (cellSize / 2.5) * pulse;
 
       ctx.save();
       ctx.shadowColor = '#00f3ff';
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 16;
 
       // Outer diamond halo
       ctx.strokeStyle = '#00f3ff';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.stroke();
@@ -791,16 +834,16 @@
       if (bonusFood) {
         const bx = bonusFood.x * cellSize + cellSize / 2;
         const by = bonusFood.y * cellSize + cellSize / 2;
-        const bRadius = cellSize / 2.3;
+        const bRadius = cellSize / 2.2;
 
         ctx.save();
         ctx.shadowColor = '#ff0055';
-        ctx.shadowBlur = 18;
+        ctx.shadowBlur = 20;
         ctx.fillStyle = '#ff0055';
 
-        // Draw rotated diamond shape
+        // Draw rotating cyber gem
         ctx.translate(bx, by);
-        ctx.rotate((time * 0.004) % (Math.PI * 2));
+        ctx.rotate((time * 0.005) % (Math.PI * 2));
         ctx.beginPath();
         ctx.moveTo(0, -bRadius);
         ctx.lineTo(bRadius, 0);
@@ -809,7 +852,7 @@
         ctx.closePath();
         ctx.fill();
 
-        ctx.fillStyle = '#ffe6ef';
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(-bRadius * 0.25, -bRadius * 0.25, bRadius * 0.5, bRadius * 0.5);
         ctx.restore();
       }
@@ -826,38 +869,37 @@
         const isHead = i === 0;
 
         if (isHead) {
-          // Snake Head: bright cyan with distinct eye sensors
+          // Snake Head: prominent cyberpunk head with laser optic eye
           ctx.shadowColor = '#00f3ff';
-          ctx.shadowBlur = 14;
+          ctx.shadowBlur = 18;
           ctx.fillStyle = '#00f3ff';
           ctx.fillRect(px + 1, py + 1, cellSize - 2, cellSize - 2);
 
-          // Head inner highlight
+          // Head inner chassis
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(px + 3, py + 3, cellSize - 6, cellSize - 6);
 
-          // Directional visor accent
+          // Bright directional scanner bar on front of snake head
           ctx.fillStyle = '#ff0055';
-          const eyeSize = cellSize * 0.2;
+          ctx.shadowColor = '#ff0055';
+          ctx.shadowBlur = 12;
+
+          const barThickness = cellSize * 0.25;
           if (direction.x === 1) {
-            ctx.fillRect(px + cellSize - eyeSize - 1, py + 2, eyeSize, eyeSize);
-            ctx.fillRect(px + cellSize - eyeSize - 1, py + cellSize - eyeSize - 2, eyeSize, eyeSize);
+            ctx.fillRect(px + cellSize - barThickness, py + 2, barThickness, cellSize - 4);
           } else if (direction.x === -1) {
-            ctx.fillRect(px + 1, py + 2, eyeSize, eyeSize);
-            ctx.fillRect(px + 1, py + cellSize - eyeSize - 2, eyeSize, eyeSize);
+            ctx.fillRect(px, py + 2, barThickness, cellSize - 4);
           } else if (direction.y === 1) {
-            ctx.fillRect(px + 2, py + cellSize - eyeSize - 1, eyeSize, eyeSize);
-            ctx.fillRect(px + cellSize - eyeSize - 2, py + cellSize - eyeSize - 1, eyeSize, eyeSize);
+            ctx.fillRect(px + 2, py + cellSize - barThickness, cellSize - 4, barThickness);
           } else {
-            ctx.fillRect(px + 2, py + 1, eyeSize, eyeSize);
-            ctx.fillRect(px + cellSize - eyeSize - 2, py + 1, eyeSize, eyeSize);
+            ctx.fillRect(px + 2, py, cellSize - 4, barThickness);
           }
         } else {
-          // Snake Body: Gradient decay along spine
+          // Snake Body: High contrast tech segments
           const ratio = 1 - i / snake.length;
-          ctx.shadowColor = 'rgba(0, 243, 255, 0.4)';
-          ctx.shadowBlur = 6 * ratio;
-          ctx.fillStyle = `rgba(0, ${Math.floor(180 + 75 * ratio)}, ${Math.floor(210 + 45 * ratio)}, ${0.4 + 0.6 * ratio})`;
+          ctx.shadowColor = 'rgba(0, 243, 255, 0.45)';
+          ctx.shadowBlur = 8 * ratio;
+          ctx.fillStyle = `rgba(0, ${Math.floor(190 + 65 * ratio)}, ${Math.floor(220 + 35 * ratio)}, ${0.6 + 0.4 * ratio})`;
           
           const inset = 1.5;
           ctx.fillRect(
@@ -867,11 +909,9 @@
             cellSize - inset * 2
           );
 
-          // Inner tech grid detail
-          if (i % 2 === 0) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-            ctx.fillRect(px + cellSize * 0.3, py + cellSize * 0.3, cellSize * 0.4, cellSize * 0.4);
-          }
+          // Internal cyber-core node
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.fillRect(px + cellSize * 0.32, py + cellSize * 0.32, cellSize * 0.36, cellSize * 0.36);
         }
       }
       ctx.restore();
@@ -921,17 +961,25 @@
     }
 
     /* ==========================================================================
-       USER INPUT HANDLING
+       USER INPUT HANDLING (Buffered & Safe for iPhone)
        ========================================================================== */
-    function setDirection(newDir) {
+    function queueDirection(newDir) {
       if (!isGameRunning || isPaused) return;
 
-      // Prevent 180 degree immediate reversal
-      if (newDir.x !== 0 && direction.x === -newDir.x) return;
-      if (newDir.y !== 0 && direction.y === -newDir.y) return;
+      // Inspect latest planned direction (either in queue or active)
+      const lastPlanned = inputQueue.length > 0 ? inputQueue[inputQueue.length - 1] : direction;
 
-      nextDirection = newDir;
-      audio.moveSound();
+      // Disallow reversing into yourself or duplicate direction
+      if (newDir.x === lastPlanned.x && newDir.y === lastPlanned.y) return;
+      if (newDir.x !== 0 && lastPlanned.x === -newDir.x) return;
+      if (newDir.y !== 0 && lastPlanned.y === -newDir.y) return;
+
+      // Keep maximum 2 buffered inputs for immediate, snappy response
+      if (inputQueue.length < 2) {
+        inputQueue.push(newDir);
+        audio.moveSound();
+        triggerHaptic(12);
+      }
     }
 
     window.addEventListener('keydown', (e) => {
@@ -957,49 +1005,57 @@
         case 'ArrowUp':
         case 'KeyW':
           e.preventDefault();
-          setDirection({ x: 0, y: -1 });
+          queueDirection({ x: 0, y: -1 });
           break;
         case 'ArrowDown':
         case 'KeyS':
           e.preventDefault();
-          setDirection({ x: 0, y: 1 });
+          queueDirection({ x: 0, y: 1 });
           break;
         case 'ArrowLeft':
         case 'KeyA':
           e.preventDefault();
-          setDirection({ x: -1, y: 0 });
+          queueDirection({ x: -1, y: 0 });
           break;
         case 'ArrowRight':
         case 'KeyD':
           e.preventDefault();
-          setDirection({ x: 1, y: 0 });
+          queueDirection({ x: 1, y: 0 });
           break;
       }
     });
 
-    // Touch D-Pad setup
-    document.getElementById('btnUp').addEventListener('touchstart', (e) => { e.preventDefault(); setDirection({ x: 0, y: -1 }); });
-    document.getElementById('btnDown').addEventListener('touchstart', (e) => { e.preventDefault(); setDirection({ x: 0, y: 1 }); });
-    document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); setDirection({ x: -1, y: 0 }); });
-    document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); setDirection({ x: 1, y: 0 }); });
+    // iPhone Ergonomic Touch D-Pad listeners (both touchstart & click fallbacks)
+    const setupPadButton = (id, dir) => {
+      const el = document.getElementById(id);
+      const handler = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        queueDirection(dir);
+      };
+      el.addEventListener('touchstart', handler, { passive: false });
+      el.addEventListener('click', handler);
+    };
 
-    document.getElementById('btnUp').addEventListener('click', () => setDirection({ x: 0, y: -1 }));
-    document.getElementById('btnDown').addEventListener('click', () => setDirection({ x: 0, y: 1 }));
-    document.getElementById('btnLeft').addEventListener('click', () => setDirection({ x: -1, y: 0 }));
-    document.getElementById('btnRight').addEventListener('click', () => setDirection({ x: 1, y: 0 }));
+    setupPadButton('btnUp', { x: 0, y: -1 });
+    setupPadButton('btnDown', { x: 0, y: 1 });
+    setupPadButton('btnLeft', { x: -1, y: 0 });
+    setupPadButton('btnRight', { x: 1, y: 0 });
 
-    // Swipe gesture support on canvas
+    // Smooth Full-Screen Swipe Support on the Canvas
     let touchStartX = 0;
     let touchStartY = 0;
+    let touchStartTime = 0;
 
     canvas.addEventListener('touchstart', (e) => {
       const touch = e.touches[0];
       touchStartX = touch.clientX;
       touchStartY = touch.clientY;
+      touchStartTime = performance.now();
     }, { passive: false });
 
     canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault(); // Stop mobile scroll
+      e.preventDefault(); // Prevent iOS bounce/pull-to-refresh
     }, { passive: false });
 
     canvas.addEventListener('touchend', (e) => {
@@ -1007,18 +1063,17 @@
       const touch = e.changedTouches[0];
       const dx = touch.clientX - touchStartX;
       const dy = touch.clientY - touchStartY;
-      const threshold = 25;
+      const dt = performance.now() - touchStartTime;
 
-      if (Math.abs(dx) > Math.abs(dy)) {
-        if (Math.abs(dx) > threshold) {
-          setDirection(dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
-        }
-      } else {
-        if (Math.abs(dy) > threshold) {
-          setDirection(dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
+      const threshold = 18; // Low threshold for instant finger response
+      if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+        if (Math.abs(dx) > Math.abs(dy)) {
+          queueDirection(dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
+        } else {
+          queueDirection(dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
         }
       }
-    });
+    }, { passive: false });
 
     /* ==========================================================================
        GAME FLOW & UI CONTROLS
@@ -1043,11 +1098,22 @@
     startGameBtn.addEventListener('click', startGame);
     restartGameBtn.addEventListener('click', restartGame);
 
+    warpToggleBtn.addEventListener('click', () => {
+      warpMode = !warpMode;
+      warpLabel.textContent = warpMode ? 'ON' : 'OFF';
+      warpToggleBtn.classList.toggle('border-emerald-500/50', warpMode);
+      warpToggleBtn.classList.toggle('text-emerald-300', warpMode);
+      warpToggleBtn.classList.toggle('border-slate-600', !warpMode);
+      warpToggleBtn.classList.toggle('text-slate-400', !warpMode);
+      triggerHaptic(20);
+    });
+
     soundToggleBtn.addEventListener('click', () => {
       audio.muted = !audio.muted;
       soundLabel.textContent = audio.muted ? 'SFX OFF' : 'SFX ON';
       soundToggleBtn.classList.toggle('border-pink-500', audio.muted);
       soundToggleBtn.classList.toggle('text-pink-400', audio.muted);
+      triggerHaptic(20);
     });
 
     /* ==========================================================================
