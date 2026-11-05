@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>CYBER_SNAKE // BY LUKE CHIU</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Orbitron & Rajdhani for Cyberpunk UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --neon-cyan: #00f3ff;
+      --neon-magenta: #ff0055;
+      --neon-amber: #ffb700;
+      --neon-green: #05ffa1;
+      --bg-dark: #070913;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      font-family: 'Rajdhani', sans-serif;
+      color: #e2e8f0;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+      touch-action: none;
+    }
+
+    .font-cyber {
+      font-family: 'Orbitron', monospace;
+    }
+
+    /* CRT scanline and vignette overlay */
+    .scanlines {
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.35) 50%
+      ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.03),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 0, 255, 0.03)
+      );
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    /* Futuristic glow styling */
+    .neon-box-cyan {
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
+      border: 1px solid rgba(0, 243, 255, 0.6);
+    }
+
+    .neon-text-cyan {
+      text-shadow: 0 0 8px rgba(0, 243, 255, 0.7), 0 0 18px rgba(0, 243, 255, 0.4);
+    }
+
+    .neon-text-magenta {
+      text-shadow: 0 0 8px rgba(255, 0, 85, 0.7), 0 0 18px rgba(255, 0, 85, 0.4);
+    }
+
+    .neon-button {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease-in-out;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+
+    .neon-button:hover {
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .neon-button:active {
+      transform: translateY(1px);
+    }
+
+    /* Cyber border accents */
+    .corner-accent {
+      position: relative;
+    }
+    .corner-accent::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--neon-cyan);
+      border-left: 2px solid var(--neon-cyan);
+    }
+    .corner-accent::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      border-bottom: 2px solid var(--neon-cyan);
+      border-right: 2px solid var(--neon-cyan);
+    }
+
+    /* Touch Control Buttons */
+    .d-pad-btn {
+      touch-action: manipulation;
+      backdrop-filter: blur(8px);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .d-pad-btn:active {
+      background-color: rgba(0, 243, 255, 0.4);
+      transform: scale(0.92);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+    }
+
+    /* Cyber Cinematic Intro Animations */
+    @keyframes glitch-anim {
+      0% { transform: translate(0); text-shadow: -2px 2px #ff0055, 2px -2px #00f3ff; }
+      20% { transform: translate(-3px, 2px); text-shadow: 3px -1px #ff0055, -2px 2px #00f3ff; }
+      40% { transform: translate(-1px, -2px); text-shadow: -2px -2px #ff0055, 1px 3px #00f3ff; }
+      60% { transform: translate(3px, 1px); text-shadow: 2px 2px #ff0055, -3px -1px #00f3ff; }
+      80% { transform: translate(1px, -2px); text-shadow: -1px 2px #ff0055, 2px -2px #00f3ff; }
+      100% { transform: translate(0); text-shadow: -2px 2px #ff0055, 2px -2px #00f3ff; }
+    }
+
+    .glitch-text {
+      animation: glitch-anim 0.28s infinite alternate;
+    }
+
+    @keyframes laser-sweep {
+      0% { top: -10%; opacity: 0; }
+      50% { opacity: 1; }
+      100% { top: 110%; opacity: 0; }
+    }
+
+    .laser-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00f3ff, #ff0055, #00f3ff, transparent);
+      box-shadow: 0 0 15px #00f3ff, 0 0 25px #ff0055;
+      animation: laser-sweep 2.2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="h-[100dvh] w-screen flex flex-col items-center justify-between p-2 sm:p-4 relative select-none">
+  <!-- Scanlines filter -->
+  <div class="scanlines fixed inset-0 z-40 pointer-events-none"></div>
+
+  <!-- Cyberpunk Intro Overlay -->
+  <div id="introOverlay" class="fixed inset-0 z-50 bg-[#04060c] flex flex-col items-center justify-center p-6 text-center select-none overflow-hidden transition-opacity duration-700">
+    <div class="laser-line"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,243,255,0.12)_0%,transparent_70%)] pointer-events-none"></div>
+
+    <div class="relative z-10 flex flex-col items-center max-w-sm w-full">
+      <!-- Boot status telemetry -->
+      <div id="introBootStatus" class="font-cyber text-[10px] sm:text-xs text-cyan-400 tracking-[0.25em] mb-4 uppercase opacity-80">
+        [INITIALIZING NEURAL LINK...]
+      </div>
+
+      <!-- Creator highlight badge -->
+      <div class="w-full flex items-center justify-center space-x-2 my-1">
+        <span class="h-[1px] w-8 sm:w-12 bg-gradient-to-r from-transparent to-pink-500"></span>
+        <span class="text-xs sm:text-sm font-cyber tracking-[0.3em] text-pink-400 font-bold uppercase neon-text-magenta">
+          A PRODUCTION BY
+        </span>
+        <span class="h-[1px] w-8 sm:w-12 bg-gradient-to-l from-transparent to-pink-500"></span>
+      </div>
+
+      <!-- Big animated name -->
+      <div class="my-4 relative">
+        <h1 id="introCreatorName" class="font-cyber font-black text-3xl sm:text-4xl tracking-[0.18em] text-white glitch-text uppercase" style="text-shadow: 0 0 20px rgba(0,243,255,0.8), 0 0 35px rgba(255,0,85,0.8);">
+          LUKE CHIU
+        </h1>
+        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-cyan-400 via-pink-500 to-cyan-400 shadow-[0_0_10px_#00f3ff]"></div>
+      </div>
+
+      <p id="introSubtext" class="text-xs sm:text-sm font-cyber text-cyan-300/80 tracking-widest mt-2 mb-6">
+        NEURAL ARCHITECTURE // v2.06
+      </p>
+
+      <!-- Skip / Proceed Button -->
+      <button id="skipIntroBtn" class="neon-button px-6 py-2 bg-transparent border border-cyan-400/60 hover:border-cyan-300 text-cyan-300 font-cyber text-xs tracking-widest uppercase rounded shadow-[0_0_15px_rgba(0,243,255,0.3)] active:scale-95 transition-all">
+        ENTER GRID [SKIP]
+      </button>
+    </div>
+  </div>
+
+  <!-- Ambient background glow elements -->
+  <div class="fixed top-1/4 left-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+  <div class="fixed bottom-1/4 right-1/4 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+  <!-- Top Header / HUD Bar -->
+  <header class="w-full max-w-md flex flex-col items-center z-10 shrink-0">
+    <div class="flex items-center justify-between w-full px-2 py-1 border-b border-cyan-500/30">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+        <div class="flex flex-col">
+          <h1 class="font-cyber text-lg sm:text-xl font-black tracking-widest text-cyan-400 neon-text-cyan leading-tight">
+            NEON_SNAKE
+          </h1>
+          <span class="text-xs sm:text-sm tracking-wider text-pink-400 font-cyber font-black neon-text-magenta">
+            ⚡ BY LUKE CHIU ⚡
+          </span>
+        </div>
+      </div>
+      
+      <!-- Audio toggle & Info icon -->
+      <div class="flex items-center space-x-2">
+        <button id="soundToggleBtn" class="text-xs uppercase tracking-wider px-2 py-1 rounded bg-slate-900/80 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 transition-all flex items-center gap-1 active:scale-95">
+          <svg id="soundIconOn" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+          <span id="soundLabel">SFX</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Display -->
+    <div class="grid grid-cols-3 gap-2 w-full mt-2 font-cyber">
+      <div class="bg-slate-950/70 p-1.5 sm:p-2 rounded neon-box-cyan flex flex-col items-center corner-accent">
+        <span class="text-[9px] text-cyan-400/80 tracking-wider">SCORE</span>
+        <span id="scoreDisplay" class="text-lg sm:text-xl font-bold text-cyan-300">0000</span>
+      </div>
+      <div class="bg-slate-950/70 p-1.5 sm:p-2 rounded neon-box-cyan flex flex-col items-center corner-accent">
+        <span class="text-[9px] text-pink-400/80 tracking-wider">HIGH</span>
+        <span id="highScoreDisplay" class="text-lg sm:text-xl font-bold text-pink-400 neon-text-magenta">0000</span>
+      </div>
+      <div class="bg-slate-950/70 p-1.5 sm:p-2 rounded neon-box-cyan flex flex-col items-center corner-accent">
+        <span class="text-[9px] text-amber-400/80 tracking-wider">SPEED</span>
+        <span id="speedDisplay" class="text-lg sm:text-xl font-bold text-amber-400">LVL 01</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Game Arena Centerpiece (Optimized for iPhone dimensions) -->
+  <main class="relative flex items-center justify-center w-full max-w-md my-auto z-10 px-2">
+    <div class="relative w-full aspect-square max-h-[46vh] rounded-xl overflow-hidden neon-box-cyan bg-slate-950/95 shadow-2xl">
+      <!-- HTML5 Canvas for Game Rendering -->
+      <canvas id="gameCanvas" class="w-full h-full block touch-none"></canvas>
+
+      <!-- Start / Ready Screen Overlay -->
+      <div id="startOverlay" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center transition-opacity duration-300">
+        <div class="mb-3 px-4 py-1.5 rounded-lg text-sm sm:text-base font-cyber font-black tracking-widest text-pink-400 border-2 border-pink-500/80 bg-pink-950/40 neon-box-cyan neon-text-magenta animate-pulse shadow-lg">
+          ★ CREATED BY LUKE CHIU ★
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-cyber font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-pink-400 to-amber-300 mb-1">
+          READY RUNNER?
+        </h2>
+        <p class="text-xs text-slate-300 max-w-xs mb-4 font-medium">
+          Swipe directly on the screen or use the neon controller below.
+        </p>
+        <button id="startGameBtn" class="neon-button px-7 py-2.5 bg-cyan-500 hover:bg-cyan-400 active:scale-95 text-slate-950 font-cyber font-bold tracking-widest text-xs rounded shadow-lg shadow-cyan-500/50 uppercase cursor-pointer">
+          START RUN
+        </button>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div id="gameOverOverlay" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center opacity-0 pointer-events-none transition-all duration-300">
+        <div class="mb-2 px-3 py-1 rounded text-xs font-cyber font-bold tracking-widest text-pink-300 border border-pink-500/50 bg-pink-950/30">
+          SYSTEM PURGED // ARCHITECT: LUKE CHIU
+        </div>
+        <span class="text-[10px] font-cyber text-pink-500 tracking-widest mb-1 animate-pulse">CONNECTION TERMINATED</span>
+        <h2 class="text-3xl font-cyber font-black tracking-wider text-pink-500 neon-text-magenta mb-3">
+          SYSTEM PURGED
+        </h2>
+        <div class="w-full max-w-[240px] bg-slate-900/80 border border-pink-500/40 rounded-lg p-3 mb-4 text-left font-cyber text-xs space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-slate-400">DATA EXTRACTED:</span>
+            <span id="finalScore" class="text-cyan-400 font-bold">0000</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">RECORD PEAK:</span>
+            <span id="finalHigh" class="text-pink-400 font-bold">0000</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">MAX VELOCITY:</span>
+            <span id="finalSpeed" class="text-amber-400 font-bold">LVL 01</span>
+          </div>
+        </div>
+        <button id="restartGameBtn" class="neon-button px-7 py-2.5 bg-pink-600 hover:bg-pink-500 active:scale-95 text-white font-cyber font-bold tracking-widest text-xs rounded shadow-lg shadow-pink-600/50 uppercase cursor-pointer">
+          REBOOT SYSTEM
+        </button>
+      </div>
+
+      <!-- Pause Indicator -->
+      <div id="pauseOverlay" class="absolute top-3 right-3 bg-slate-900/80 border border-amber-400 text-amber-400 px-2.5 py-0.5 font-cyber text-[10px] rounded tracking-widest hidden animate-pulse">
+        PAUSED
+      </div>
+    </div>
+  </main>
+
+  <!-- Mobile / Touch Controls D-Pad (Refined ergonomic iPhone layout) -->
+  <div class="w-full max-w-xs flex flex-col items-center z-10 shrink-0 mb-1">
+    <button id="btnUp" class="d-pad-btn w-14 h-12 mb-1.5 flex items-center justify-center rounded-xl bg-slate-900/90 border border-cyan-500/50 text-cyan-300 shadow-md">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+      </svg>
+    </button>
+    <div class="flex justify-between w-48">
+      <button id="btnLeft" class="d-pad-btn w-14 h-12 flex items-center justify-center rounded-xl bg-slate-900/90 border border-cyan-500/50 text-cyan-300 shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <button id="btnDown" class="d-pad-btn w-14 h-12 flex items-center justify-center rounded-xl bg-slate-900/90 border border-cyan-500/50 text-cyan-300 shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      <button id="btnRight" class="d-pad-btn w-14 h-12 flex items-center justify-center rounded-xl bg-slate-900/90 border border-cyan-500/50 text-cyan-300 shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom status info -->
+  <footer class="text-xs text-slate-400 tracking-wider font-cyber flex items-center justify-center gap-3 z-10 shrink-0 pb-1">
+    <span class="text-pink-400 font-extrabold text-sm tracking-widest neon-text-magenta">⚡ DEVELOPED BY LUKE CHIU ⚡</span>
+    <span class="text-cyan-500">•</span>
+    <span>FPS: <span id="fpsCounter">60</span></span>
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       SYNTHESIZED SOUND SYSTEM (Web Audio API)
+       Self-contained cyber audio without external asset dependencies
+       ========================================================================== */
+    class CyberAudio {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freq, type = 'sine', duration = 0.1, stopGain = 0.001) {
+        if (this.muted) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(stopGain, this.ctx.currentTime + duration);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {
+          // Audio fallback fails silently
+        }
+      }
+
+      eatFoodSound() {
+        if (this.muted) return;
+        this.init();
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } catch (e) {}
+      }
+
+      bonusFoodSound() {
+        if (this.muted) return;
+        this.init();
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.linearRampToValueAtTime(1100, now + 0.2);
+
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } catch (e) {}
+      }
+
+      crashSound() {
+        if (this.muted) return;
+        this.init();
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } catch (e) {}
+      }
+
+      moveSound() {
+        if (this.muted) return;
+        this.playTone(180, 'sine', 0.03, 0.001);
+      }
+
+      introBoopSound(freq = 440) {
+        if (this.muted) return;
+        this.playTone(freq, 'sawtooth', 0.08, 0.001);
+      }
+
+      introBoomSound() {
+        if (this.muted) return;
+        this.init();
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(45, now + 1.2);
+
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 1.2);
+        } catch (e) {}
+      }
+    }
+
+    const audio = new CyberAudio();
+
+    /* ==========================================================================
+       GAME ENGINE & STATE
+       ========================================================================== */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // UI Element references
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const highScoreDisplay = document.getElementById('highScoreDisplay');
+    const speedDisplay = document.getElementById('speedDisplay');
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const pauseOverlay = document.getElementById('pauseOverlay');
+    const startGameBtn = document.getElementById('startGameBtn');
+    const restartGameBtn = document.getElementById('restartGameBtn');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const soundLabel = document.getElementById('soundLabel');
+    const introOverlay = document.getElementById('introOverlay');
+    const introBootStatus = document.getElementById('introBootStatus');
+    const introCreatorName = document.getElementById('introCreatorName');
+    const skipIntroBtn = document.getElementById('skipIntroBtn');
+    const finalScore = document.getElementById('finalScore');
+    const finalHigh = document.getElementById('finalHigh');
+    const finalSpeed = document.getElementById('finalSpeed');
+    const fpsCounter = document.getElementById('fpsCounter');
+
+    // Grid configuration
+    const GRID_SIZE = 22; // 22x22 grid
+    let cellSize = 0;
+
+    // Game variables
+    let snake = [];
+    let direction = { x: 1, y: 0 };
+    let nextDirection = { x: 1, y: 0 };
+    let food = { x: 15, y: 11, type: 'regular' };
+    let bonusFood = null;
+    let bonusTimer = 0;
+    let score = 0;
+    let highScore = localStorage.getItem('cyber_snake_highscore') || 0;
+    let speedLevel = 1;
+    let gameSpeed = 120; // milliseconds per step
+    let lastStepTime = 0;
+    let isGameOver = false;
+    let isGameRunning = false;
+    let isPaused = false;
+    let particles = [];
+
+    // Frame Rate Tracking
+    let lastFrameTime = performance.now();
+    let frameCount = 0;
+    let fpsTimer = performance.now();
+
+    /* ==========================================================================
+       RESIZING & CANVAS BUFFERING
+       ========================================================================== */
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const pixelRatio = window.devicePixelRatio || 1;
+      
+      // Keep internal resolution high for crisp rendering
+      canvas.width = rect.width * pixelRatio;
+      canvas.height = rect.height * pixelRatio;
+
+      ctx.resetTransform?.();
+      ctx.scale(pixelRatio, pixelRatio);
+
+      cellSize = rect.width / GRID_SIZE;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    /* ==========================================================================
+       PARTICLE SYSTEM (Neon Spikes / Data Bursts)
+       ========================================================================== */
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3 + 1;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.life = Math.random() * 20 + 20;
+        this.size = Math.random() * 3 + 1.5;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= 1 / this.life;
+        this.size *= 0.96;
+      }
+
+      draw(c) {
+        c.save();
+        c.globalAlpha = Math.max(0, this.alpha);
+        c.shadowColor = this.color;
+        c.shadowBlur = 6;
+        c.fillStyle = this.color;
+        c.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+        c.restore();
+      }
+    }
+
+    function spawnFoodParticles(gx, gy, color) {
+      const centerX = gx * cellSize + cellSize / 2;
+      const centerY = gy * cellSize + cellSize / 2;
+      for (let i = 0; i < 18; i++) {
+        particles.push(new Particle(centerX, centerY, color));
+      }
+    }
+
+    /* ==========================================================================
+       CORE GAME MECHANICS
+       ========================================================================== */
+    function initGame() {
+      snake = [
+        { x: 5, y: 10 },
+        { x: 4, y: 10 },
+        { x: 3, y: 10 }
+      ];
+      direction = { x: 1, y: 0 };
+      nextDirection = { x: 1, y: 0 };
+      score = 0;
+      speedLevel = 1;
+      gameSpeed = 120;
+      isGameOver = false;
+      isPaused = false;
+      particles = [];
+      bonusFood = null;
+      spawnFood();
+      updateHUD();
+      resizeCanvas();
+    }
+
+    function spawnFood() {
+      let valid = false;
+      while (!valid) {
+        const nx = Math.floor(Math.random() * GRID_SIZE);
+        const ny = Math.floor(Math.random() * GRID_SIZE);
+        
+        // Ensure food does not spawn inside snake
+        const insideSnake = snake.some(seg => seg.x === nx && seg.y === ny);
+        if (!insideSnake) {
+          food = { x: nx, y: ny, type: 'regular' };
+          valid = true;
+        }
+      }
+
+      // Chance to spawn special temporary Cyber Gem
+      if (Math.random() < 0.25 && !bonusFood) {
+        spawnBonusFood();
+      }
+    }
+
+    function spawnBonusFood() {
+      let valid = false;
+      while (!valid) {
+        const nx = Math.floor(Math.random() * GRID_SIZE);
+        const ny = Math.floor(Math.random() * GRID_SIZE);
+        const collision = snake.some(s => s.x === nx && s.y === ny) || (food.x === nx && food.y === ny);
+        if (!collision) {
+          bonusFood = { x: nx, y: ny, timer: 65 }; // lasts 65 ticks
+          valid = true;
+        }
+      }
+    }
+
+    function update() {
+      if (!isGameRunning || isGameOver || isPaused) return;
+
+      direction = { ...nextDirection };
+
+      const head = {
+        x: snake[0].x + direction.x,
+        y: snake[0].y + direction.y
+      };
+
+      // Wall Collision Check
+      if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+        triggerGameOver();
+        return;
+      }
+
+      // Self Collision Check
+      if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+        triggerGameOver();
+        return;
+      }
+
+      snake.unshift(head);
+
+      // Check standard food pickup
+      if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        audio.eatFoodSound();
+        spawnFoodParticles(food.x, food.y, '#00f3ff');
+        adjustDifficulty();
+        spawnFood();
+      } 
+      // Check bonus cyber gem pickup
+      else if (bonusFood && head.x === bonusFood.x && head.y === bonusFood.y) {
+        score += 35;
+        audio.bonusFoodSound();
+        spawnFoodParticles(bonusFood.x, bonusFood.y, '#ff0055');
+        bonusFood = null;
+        adjustDifficulty();
+      } else {
+        snake.pop();
+      }
+
+      // Manage bonus food timer
+      if (bonusFood) {
+        bonusFood.timer--;
+        if (bonusFood.timer <= 0) {
+          bonusFood = null;
+        }
+      }
+
+      updateHUD();
+    }
+
+    function adjustDifficulty() {
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('cyber_snake_highscore', highScore);
+      }
+
+      // Dynamic speed scaling
+      const newLevel = Math.min(10, Math.floor(score / 40) + 1);
+      if (newLevel !== speedLevel) {
+        speedLevel = newLevel;
+        gameSpeed = Math.max(50, 120 - (speedLevel - 1) * 7.5);
+      }
+    }
+
+    function updateHUD() {
+      scoreDisplay.textContent = String(score).padStart(4, '0');
+      highScoreDisplay.textContent = String(highScore).padStart(4, '0');
+      speedDisplay.textContent = `LVL ${String(speedLevel).padStart(2, '0')}`;
+    }
+
+    function triggerGameOver() {
+      isGameOver = true;
+      isGameRunning = false;
+      audio.crashSound();
+
+      finalScore.textContent = String(score).padStart(4, '0');
+      finalHigh.textContent = String(highScore).padStart(4, '0');
+      finalSpeed.textContent = `LVL ${String(speedLevel).padStart(2, '0')}`;
+
+      gameOverOverlay.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    /* ==========================================================================
+       RENDERING PIPELINE
+       ========================================================================== */
+    function drawGrid(width, height) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 243, 255, 0.05)';
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x <= width; x += cellSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= height; y += cellSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFood(time) {
+      const pulse = Math.sin(time * 0.008) * 0.2 + 0.8;
+      const x = food.x * cellSize + cellSize / 2;
+      const y = food.y * cellSize + cellSize / 2;
+      const radius = (cellSize / 2.8) * pulse;
+
+      ctx.save();
+      ctx.shadowColor = '#00f3ff';
+      ctx.shadowBlur = 15;
+
+      // Outer diamond halo
+      ctx.strokeStyle = '#00f3ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Glowing core
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // Bonus Cyber Energy Gem
+      if (bonusFood) {
+        const bx = bonusFood.x * cellSize + cellSize / 2;
+        const by = bonusFood.y * cellSize + cellSize / 2;
+        const bRadius = cellSize / 2.3;
+
+        ctx.save();
+        ctx.shadowColor = '#ff0055';
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = '#ff0055';
+
+        // Draw rotated diamond shape
+        ctx.translate(bx, by);
+        ctx.rotate((time * 0.004) % (Math.PI * 2));
+        ctx.beginPath();
+        ctx.moveTo(0, -bRadius);
+        ctx.lineTo(bRadius, 0);
+        ctx.lineTo(0, bRadius);
+        ctx.lineTo(-bRadius, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffe6ef';
+        ctx.fillRect(-bRadius * 0.25, -bRadius * 0.25, bRadius * 0.5, bRadius * 0.5);
+        ctx.restore();
+      }
+    }
+
+    function drawSnake() {
+      if (snake.length === 0) return;
+
+      ctx.save();
+      for (let i = snake.length - 1; i >= 0; i--) {
+        const seg = snake[i];
+        const px = seg.x * cellSize;
+        const py = seg.y * cellSize;
+        const isHead = i === 0;
+
+        if (isHead) {
+          // Snake Head: bright cyan with distinct eye sensors
+          ctx.shadowColor = '#00f3ff';
+          ctx.shadowBlur = 14;
+          ctx.fillStyle = '#00f3ff';
+          ctx.fillRect(px + 1, py + 1, cellSize - 2, cellSize - 2);
+
+          // Head inner highlight
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(px + 3, py + 3, cellSize - 6, cellSize - 6);
+
+          // Directional visor accent
+          ctx.fillStyle = '#ff0055';
+          const eyeSize = cellSize * 0.2;
+          if (direction.x === 1) {
+            ctx.fillRect(px + cellSize - eyeSize - 1, py + 2, eyeSize, eyeSize);
+            ctx.fillRect(px + cellSize - eyeSize - 1, py + cellSize - eyeSize - 2, eyeSize, eyeSize);
+          } else if (direction.x === -1) {
+            ctx.fillRect(px + 1, py + 2, eyeSize, eyeSize);
+            ctx.fillRect(px + 1, py + cellSize - eyeSize - 2, eyeSize, eyeSize);
+          } else if (direction.y === 1) {
+            ctx.fillRect(px + 2, py + cellSize - eyeSize - 1, eyeSize, eyeSize);
+            ctx.fillRect(px + cellSize - eyeSize - 2, py + cellSize - eyeSize - 1, eyeSize, eyeSize);
+          } else {
+            ctx.fillRect(px + 2, py + 1, eyeSize, eyeSize);
+            ctx.fillRect(px + cellSize - eyeSize - 2, py + 1, eyeSize, eyeSize);
+          }
+        } else {
+          // Snake Body: Gradient decay along spine
+          const ratio = 1 - i / snake.length;
+          ctx.shadowColor = 'rgba(0, 243, 255, 0.4)';
+          ctx.shadowBlur = 6 * ratio;
+          ctx.fillStyle = `rgba(0, ${Math.floor(180 + 75 * ratio)}, ${Math.floor(210 + 45 * ratio)}, ${0.4 + 0.6 * ratio})`;
+          
+          const inset = 1.5;
+          ctx.fillRect(
+            px + inset,
+            py + inset,
+            cellSize - inset * 2,
+            cellSize - inset * 2
+          );
+
+          // Inner tech grid detail
+          if (i % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.fillRect(px + cellSize * 0.3, py + cellSize * 0.3, cellSize * 0.4, cellSize * 0.4);
+          }
+        }
+      }
+      ctx.restore();
+    }
+
+    function render(currentTime) {
+      // Clear arena
+      const width = canvas.width / (window.devicePixelRatio || 1);
+      const height = canvas.height / (window.devicePixelRatio || 1);
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Cyber Grid Backing
+      drawGrid(width, height);
+
+      // Food & Special Gems
+      drawFood(currentTime);
+
+      // Snake Body & Head
+      drawSnake();
+
+      // Render Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw(ctx);
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Step loop logic based on gameSpeed
+      if (currentTime - lastStepTime > gameSpeed) {
+        update();
+        lastStepTime = currentTime;
+      }
+
+      // FPS tracking
+      frameCount++;
+      if (currentTime - fpsTimer >= 1000) {
+        fpsCounter.textContent = Math.round((frameCount * 1000) / (currentTime - fpsTimer));
+        frameCount = 0;
+        fpsTimer = currentTime;
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    /* ==========================================================================
+       USER INPUT HANDLING
+       ========================================================================== */
+    function setDirection(newDir) {
+      if (!isGameRunning || isPaused) return;
+
+      // Prevent 180 degree immediate reversal
+      if (newDir.x !== 0 && direction.x === -newDir.x) return;
+      if (newDir.y !== 0 && direction.y === -newDir.y) return;
+
+      nextDirection = newDir;
+      audio.moveSound();
+    }
+
+    window.addEventListener('keydown', (e) => {
+      // Space to start / restart
+      if (e.code === 'Space') {
+        if (!isGameRunning && !isGameOver) {
+          startGame();
+          return;
+        }
+        if (isGameOver) {
+          restartGame();
+          return;
+        }
+      }
+
+      // Pause toggle
+      if (e.code === 'KeyP' && isGameRunning && !isGameOver) {
+        togglePause();
+        return;
+      }
+
+      switch (e.code) {
+        case 'ArrowUp':
+        case 'KeyW':
+          e.preventDefault();
+          setDirection({ x: 0, y: -1 });
+          break;
+        case 'ArrowDown':
+        case 'KeyS':
+          e.preventDefault();
+          setDirection({ x: 0, y: 1 });
+          break;
+        case 'ArrowLeft':
+        case 'KeyA':
+          e.preventDefault();
+          setDirection({ x: -1, y: 0 });
+          break;
+        case 'ArrowRight':
+        case 'KeyD':
+          e.preventDefault();
+          setDirection({ x: 1, y: 0 });
+          break;
+      }
+    });
+
+    // Touch D-Pad setup
+    document.getElementById('btnUp').addEventListener('touchstart', (e) => { e.preventDefault(); setDirection({ x: 0, y: -1 }); });
+    document.getElementById('btnDown').addEventListener('touchstart', (e) => { e.preventDefault(); setDirection({ x: 0, y: 1 }); });
+    document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); setDirection({ x: -1, y: 0 }); });
+    document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); setDirection({ x: 1, y: 0 }); });
+
+    document.getElementById('btnUp').addEventListener('click', () => setDirection({ x: 0, y: -1 }));
+    document.getElementById('btnDown').addEventListener('click', () => setDirection({ x: 0, y: 1 }));
+    document.getElementById('btnLeft').addEventListener('click', () => setDirection({ x: -1, y: 0 }));
+    document.getElementById('btnRight').addEventListener('click', () => setDirection({ x: 1, y: 0 }));
+
+    // Swipe gesture support on canvas
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    canvas.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault(); // Stop mobile scroll
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+      if (!isGameRunning) return;
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      const threshold = 25;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (Math.abs(dx) > threshold) {
+          setDirection(dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
+        }
+      } else {
+        if (Math.abs(dy) > threshold) {
+          setDirection(dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
+        }
+      }
+    });
+
+    /* ==========================================================================
+       GAME FLOW & UI CONTROLS
+       ========================================================================== */
+    function startGame() {
+      audio.init();
+      initGame();
+      isGameRunning = true;
+      startOverlay.classList.add('opacity-0', 'pointer-events-none');
+      gameOverOverlay.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function restartGame() {
+      startGame();
+    }
+
+    function togglePause() {
+      isPaused = !isPaused;
+      pauseOverlay.classList.toggle('hidden', !isPaused);
+    }
+
+    startGameBtn.addEventListener('click', startGame);
+    restartGameBtn.addEventListener('click', restartGame);
+
+    soundToggleBtn.addEventListener('click', () => {
+      audio.muted = !audio.muted;
+      soundLabel.textContent = audio.muted ? 'SFX OFF' : 'SFX ON';
+      soundToggleBtn.classList.toggle('border-pink-500', audio.muted);
+      soundToggleBtn.classList.toggle('text-pink-400', audio.muted);
+    });
+
+    /* ==========================================================================
+       OPENING CINEMATIC SEQUENCE (DIRECTED BY LUKE CHIU)
+       ========================================================================== */
+    function runOpeningCinematic() {
+      const originalText = "LUKE CHIU";
+      const glyphs = "01#@$%&*<>[]{}!/?";
+      let iteration = 0;
+      let introSkipped = false;
+
+      function closeIntro() {
+        if (introSkipped) return;
+        introSkipped = true;
+        introOverlay.style.opacity = '0';
+        setTimeout(() => {
+          introOverlay.style.display = 'none';
+        }, 700);
+      }
+
+      skipIntroBtn.addEventListener('click', () => {
+        audio.init();
+        audio.introBoopSound(660);
+        closeIntro();
+      });
+
+      // Terminal boot messages timeline
+      const statusLogs = [
+        "[CONNECTING TO MAINFRAME...]",
+        "[BYPASSING FIREWALL: LEVEL 4...]",
+        "[NEURAL SYNC LOCKED: 100%]",
+        "[DIRECTED & CODED BY LUKE CHIU]"
+      ];
+
+      statusLogs.forEach((msg, idx) => {
+        setTimeout(() => {
+          if (!introSkipped) {
+            introBootStatus.textContent = msg;
+            audio.introBoopSound(300 + idx * 120);
+          }
+        }, 500 + idx * 750);
+      });
+
+      // Hacker scramble decode effect on "LUKE CHIU"
+      const glitchInterval = setInterval(() => {
+        if (introSkipped) {
+          clearInterval(glitchInterval);
+          return;
+        }
+
+        introCreatorName.innerText = originalText
+          .split("")
+          .map((letter, index) => {
+            if (index < iteration) return originalText[index];
+            return glyphs[Math.floor(Math.random() * glyphs.length)];
+          })
+          .join("");
+
+        if (iteration >= originalText.length) {
+          clearInterval(glitchInterval);
+          audio.introBoomSound();
+        }
+        iteration += 1 / 3;
+      }, 55);
+
+      // Auto dismiss after cinematic concludes
+      setTimeout(() => {
+        closeIntro();
+      }, 4000);
+    }
+
+    // Run game on load
+    window.onload = function () {
+      highScoreDisplay.textContent = String(highScore).padStart(4, '0');
+      resizeCanvas();
+      runOpeningCinematic();
+      requestAnimationFrame(render);
+    };
+  </script>
+</body>
+</html>
