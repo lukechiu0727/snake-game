@@ -1,1360 +1,1394 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sweetie Slither Sugar Arena - by Luke Chiu</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cute Dessert Snake - By Luke Chiu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       user-select: none;
       -webkit-user-select: none;
       touch-action: none;
-      font-family: 'Fredoka', 'Quicksand', cursive, sans-serif;
     }
+
     body, html {
-      margin: 0;
-      padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #fff2f6;
+      background-color: #ffe8f0;
+      font-family: 'Nunito', sans-serif;
     }
-    canvas#gameCanvas {
+
+    #gameCanvas {
       display: block;
       width: 100vw;
       height: 100vh;
-      background-color: #fff5f8;
+      background-color: #ffe8f0;
     }
-    /* Kawaii Shadows and Bounces */
-    .kawaii-glow {
-      filter: drop-shadow(0 8px 24px rgba(244, 114, 182, 0.45));
+
+    /* Top Left Sugar Score Card */
+    #score-card {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      padding: 10px 22px;
+      border-radius: 28px;
+      box-shadow: 0 8px 24px rgba(255, 134, 172, 0.25);
+      border: 3px solid #ffccd9;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+      pointer-events: none;
     }
-    .candy-btn-shadow {
-      box-shadow: 0 8px 0 #db2777, 0 15px 25px rgba(219, 39, 119, 0.35);
+
+    #score-card .cake-icon {
+      font-size: 32px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
     }
-    .candy-btn-shadow:active {
-      transform: translateY(4px);
-      box-shadow: 0 4px 0 #db2777, 0 8px 15px rgba(219, 39, 119, 0.3);
+
+    #score-card .text-wrap {
+      display: flex;
+      flex-direction: column;
     }
-    @keyframes floatingSweets {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-12px) rotate(5deg); }
+
+    #score-card .label {
+      font-family: 'Fredoka One', cursive;
+      font-size: 11px;
+      color: #ff5287;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
     }
-    .animate-float {
-      animation: floatingSweets 3.2s ease-in-out infinite;
+
+    #score-card .value {
+      font-family: 'Fredoka One', cursive;
+      font-size: 26px;
+      color: #b31d4e;
+      line-height: 1.1;
     }
-    @keyframes wiggle {
-      0%, 100% { transform: rotate(-3deg); }
-      50% { transform: rotate(3deg); }
+
+    /* Top Right Live Leaderboard */
+    #leaderboard-card {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      padding: 12px 18px;
+      border-radius: 22px;
+      box-shadow: 0 8px 24px rgba(255, 134, 172, 0.25);
+      border: 3px solid #ffccd9;
+      min-width: 190px;
+      z-index: 10;
+      pointer-events: none;
     }
-    .animate-wiggle {
-      animation: wiggle 1.8s ease-in-out infinite;
+
+    #leaderboard-card h3 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 13px;
+      color: #ff5287;
+      text-align: center;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
     }
-    @keyframes sparkleSpin {
-      0% { transform: rotate(0deg) scale(0.9); }
-      50% { transform: rotate(180deg) scale(1.15); }
-      100% { transform: rotate(360deg) scale(0.9); }
+
+    .lb-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 3px 0;
+      color: #555;
     }
-    .sparkle-icon {
-      animation: sparkleSpin 4s linear infinite;
+
+    .lb-row.player {
+      color: #e6195e;
+      font-weight: 900;
+    }
+
+    .lb-rank {
+      width: 20px;
+      color: #ff759f;
+    }
+
+    .lb-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-right: 6px;
+    }
+
+    .lb-val {
+      font-family: 'Fredoka One', cursive;
+      color: #666;
+    }
+
+    .lb-row.player .lb-val {
+      color: #e6195e;
+    }
+
+    /* Floating Virtual Joystick Base */
+    #joystick-base {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.92) 0%, rgba(255, 240, 245, 0.85) 100%);
+      border: 5px solid #ff80a6;
+      box-shadow: 0 10px 30px rgba(255, 105, 153, 0.35), inset 0 2px 6px rgba(255,255,255,0.8);
+      pointer-events: none;
+      display: none;
+      z-index: 15;
+      transform: translate(-50%, -50%);
+    }
+
+    #joystick-stick {
+      position: absolute;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff4d79, #d8114f);
+      box-shadow: 0 6px 14px rgba(216, 17, 79, 0.45);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      pointer-events: none;
+    }
+
+    /* Rush Button Bottom Right */
+    #rush-btn {
+      position: absolute;
+      bottom: 26px;
+      right: 26px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff6699 0%, #ff3366 50%, #c40a45 100%);
+      border: 5px solid #ffffff;
+      box-shadow: 0 10px 28px rgba(255, 51, 102, 0.45), 0 0 0 3px #ff94b8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: 'Fredoka One', cursive;
+      cursor: pointer;
+      z-index: 20;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      touch-action: none;
+    }
+
+    #rush-btn:active, #rush-btn.active {
+      transform: scale(0.92);
+      box-shadow: 0 4px 14px rgba(255, 51, 102, 0.6), 0 0 0 3px #ff94b8;
+    }
+
+    #rush-btn .rush-top {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 24px;
+    }
+
+    #rush-btn .rush-text {
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+    }
+
+    /* Start / Opening Splash Overlay */
+    #start-screen {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255, 235, 242, 0.97) 0%, rgba(255, 210, 226, 0.98) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-box {
+      background: #ffffff;
+      padding: 32px 36px;
+      border-radius: 36px;
+      box-shadow: 0 20px 60px rgba(245, 92, 143, 0.35);
+      border: 5px solid #ffccd9;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .game-logo {
+      font-size: 60px;
+      margin-bottom: 6px;
+      animation: bounce 1.8s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .game-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 34px;
+      color: #ff3b77;
+      text-shadow: 2px 3px 0 #ffe0ea;
+      margin-bottom: 4px;
+    }
+
+    .credit-badge {
+      display: inline-block;
+      font-family: 'Fredoka One', cursive;
+      background: linear-gradient(135deg, #ff7096, #ff4071);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 15px;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(255, 64, 113, 0.3);
+    }
+
+    .input-group {
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 800;
+      color: #ff5c8a;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 3px solid #ffccd9;
+      border-radius: 20px;
+      font-size: 17px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      color: #b31d4e;
+      background: #fff8fa;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: #ff5287;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(255, 82, 135, 0.18);
+    }
+
+    .play-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #ff4d79, #e6004c);
+      color: white;
+      font-family: 'Fredoka One', cursive;
+      font-size: 22px;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(230, 0, 76, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .play-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(230, 0, 76, 0.42);
+    }
+
+    .play-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Game Over Modal */
+    #gameover-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(40, 10, 25, 0.7);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .gameover-box {
+      background: #ffffff;
+      padding: 34px 40px;
+      border-radius: 36px;
+      border: 5px solid #ffccd9;
+      text-align: center;
+      max-width: 380px;
+      width: 90%;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .gameover-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 32px;
+      color: #ff2d68;
+      margin-bottom: 8px;
+    }
+
+    .final-score {
+      font-size: 16px;
+      font-weight: 800;
+      color: #777;
+      margin-bottom: 20px;
+    }
+
+    .final-score span {
+      font-family: 'Fredoka One', cursive;
+      font-size: 28px;
+      color: #c90f4e;
+      display: block;
+      margin-top: 4px;
     }
   </style>
 </head>
-<body class="relative text-pink-900 select-none overflow-hidden">
+<body>
 
-  <!-- Main Game Canvas -->
+  <!-- Game Canvas -->
   <canvas id="gameCanvas"></canvas>
 
-  <!-- HUD Overlay -->
-  <div id="hudLayer" class="absolute inset-0 pointer-events-none hidden flex flex-col justify-between p-4 z-10">
-    <!-- Top Bar -->
-    <div class="flex justify-between items-start">
-      <!-- Player Stats Card -->
-      <div class="bg-white/90 backdrop-blur-md border-3 border-pink-300 rounded-3xl px-5 py-3 shadow-xl flex items-center space-x-4 pointer-events-auto">
-        <div class="flex items-center space-x-2.5">
-          <span class="text-2xl animate-wiggle">🍰</span>
-          <div>
-            <div class="text-[11px] text-pink-400 font-bold uppercase tracking-wider">Sugar Score</div>
-            <div id="scoreVal" class="text-2xl font-black text-pink-600">100</div>
-          </div>
-        </div>
-        <div class="h-9 w-0.5 bg-pink-200 hidden sm:block"></div>
-        <div class="hidden sm:block">
-          <div class="text-[11px] text-pink-400 font-bold uppercase tracking-wider">Length</div>
-          <div id="lengthVal" class="text-xl font-bold text-purple-500">25</div>
-        </div>
-        <div class="h-9 w-0.5 bg-pink-200 hidden md:block"></div>
-        <div class="hidden md:block">
-          <div class="text-[11px] text-pink-400 font-bold uppercase tracking-wider">Sweeties Left</div>
-          <div id="enemiesCountVal" class="text-xl font-bold text-amber-500">12</div>
-        </div>
-      </div>
-
-      <!-- Top Right Stack: Mini Map & Leaderboard -->
-      <div class="flex flex-col items-end space-y-2 pointer-events-auto">
-        <!-- Mini Map Canvas -->
-        <div id="minimapContainer" class="pointer-events-none hidden">
-          <canvas id="minimapCanvas" width="120" height="120" class="rounded-2xl border-3 border-pink-300 bg-white/85 shadow-xl backdrop-blur-md"></canvas>
-        </div>
-
-        <!-- Leaderboard -->
-        <div class="bg-white/90 backdrop-blur-md border-3 border-purple-200 rounded-3xl p-3 shadow-xl w-48 hidden sm:block">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-purple-600 mb-1.5 flex items-center justify-between">
-            <span>👑 Sugar Leaderboard</span>
-            <span class="text-[9px] bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full font-bold">Top 5</span>
-          </div>
-          <ol id="leaderboardList" class="text-xs space-y-1 font-bold">
-            <!-- Populated in JS -->
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Controls Zone -->
-    <div class="flex justify-between items-end pb-2 pointer-events-auto">
-      <!-- Virtual Joystick container (Mobile & touch-enabled) -->
-      <div id="joystickZone" class="w-36 h-36 relative rounded-full bg-white/70 backdrop-blur-md border-4 border-pink-300 flex items-center justify-center shadow-lg shadow-pink-200 select-none touch-none">
-        <div id="joystickKnob" class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 shadow-md shadow-pink-400/50 border-3 border-white pointer-events-none transform transition-transform duration-75 flex items-center justify-center text-white text-xl">
-          🍓
-        </div>
-      </div>
-
-      <!-- Center Tip for Desktop -->
-      <div class="hidden md:flex flex-col items-center text-xs text-pink-700 bg-white/85 backdrop-blur-sm px-5 py-2.5 rounded-2xl border-2 border-pink-200 shadow-md">
-        <span>🐾 <span class="bg-pink-100 px-2 py-0.5 rounded-md font-bold text-pink-600">Mouse</span> or <span class="bg-pink-100 px-2 py-0.5 rounded-md font-bold text-pink-600">WASD / Arrow Keys</span> to steer</span>
-        <span class="mt-1">✨ Hold <span class="bg-purple-100 px-2 py-0.5 rounded-md font-bold text-purple-600">SPACE</span> or Click to trigger <b>Sugar Rush!</b></span>
-      </div>
-
-      <!-- Sugar Rush / Sprint Button (Right) -->
-      <div class="flex flex-col items-center">
-        <button id="boostBtn" class="w-22 h-22 p-4 rounded-full bg-gradient-to-tr from-pink-500 via-rose-400 to-amber-300 shadow-lg shadow-pink-400/50 border-4 border-white flex flex-col items-center justify-center text-white active:scale-95 transition-transform duration-100">
-          <span class="text-2xl">⚡🍩</span>
-          <span class="text-[11px] font-black tracking-wide uppercase mt-0.5">Rush!</span>
-        </button>
-      </div>
+  <!-- Sugar Score Card (Top-Left) -->
+  <div id="score-card">
+    <div class="cake-icon">🍰</div>
+    <div class="text-wrap">
+      <div class="label">Sugar Score</div>
+      <div class="value" id="score-val">0</div>
     </div>
   </div>
 
-  <!-- Cute Opening Splash Screen -->
-  <div id="introScreen" class="absolute inset-0 z-30 flex items-center justify-center bg-gradient-to-b from-[#fff0f5]/95 via-[#ffe6ef]/95 to-[#fce4ec]/95 backdrop-blur-md px-4">
-    <div class="max-w-md w-full text-center space-y-5 animate-float">
-      
-      <!-- Top Sweets Garland Banner -->
-      <div class="flex items-center justify-center space-x-3 text-3xl">
-        <span class="animate-wiggle">🧁</span>
-        <span class="sparkle-icon">✨</span>
-        <span class="text-4xl animate-bounce">🍩</span>
-        <span class="sparkle-icon">✨</span>
-        <span class="animate-wiggle">🍓</span>
-      </div>
+  <!-- Live Leaderboard (Top-Right) -->
+  <div id="leaderboard-card">
+    <h3>👑 TOP SWEETS</h3>
+    <div id="leaderboard-list"></div>
+  </div>
 
-      <div class="inline-block px-4 py-1.5 rounded-full bg-pink-100 border-2 border-pink-300 text-pink-600 text-xs font-bold uppercase tracking-wider shadow-sm">
-        🍧 Sweet 360° Dessert Slither Arena 🍬
-      </div>
+  <!-- Dynamic Floating Joystick -->
+  <div id="joystick-base">
+    <div id="joystick-stick">🍓</div>
+  </div>
 
-      <!-- Main Game Title -->
-      <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-rose-400 to-purple-500 kawaii-glow">
-        SWEETIE SLITHER
-      </h1>
+  <!-- Rush Button (Bottom-Right) -->
+  <div id="rush-btn">
+    <div class="rush-top">
+      <span>⚡</span>
+      <span>🍩</span>
+    </div>
+    <div class="rush-text">RUSH!</div>
+  </div>
 
-      <!-- Mandatory "Created by Luke Chiu" with Cute Theme -->
-      <div class="py-1">
-        <p class="text-xs font-bold tracking-widest text-purple-400 uppercase">Designed with Love by</p>
-        <p class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 mt-0.5 tracking-wide drop-shadow-sm flex items-center justify-center gap-2">
-          <span>💖</span> Created by Luke Chiu <span>🍰</span>
-        </p>
+  <!-- Start Screen with Opening Animation -->
+  <div id="start-screen">
+    <div class="modal-box">
+      <div class="game-logo">🍰🍓🍩</div>
+      <h1 class="game-title">Sugar Slither</h1>
+      <div class="credit-badge">By Luke Chiu</div>
+      <div class="input-group">
+        <label for="nickname-input">Sweet Nickname</label>
+        <input type="text" id="nickname-input" maxlength="12" value="Berry Mochi" placeholder="Enter name...">
       </div>
-
-      <!-- Cute Features Card -->
-      <div class="grid grid-cols-2 gap-2.5 text-xs text-left font-bold text-pink-800 bg-white/80 p-4 rounded-3xl border-2 border-pink-200 shadow-md">
-        <div class="flex items-center space-x-2">
-          <span class="text-base">🧸</span>
-          <span>Safe from self-bumps!</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <span class="text-base">🧋</span>
-          <span>Yummy dessert foods</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <span class="text-base">🕹️</span>
-          <span>Touch Joystick + WASD</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <span class="text-base">🍭</span>
-          <span>Smooth 360° steering</span>
-        </div>
-      </div>
-
-      <!-- Custom Nickname Input -->
-      <div class="bg-white/90 p-3 rounded-2xl border-2 border-pink-300 shadow-sm flex items-center space-x-2 text-left">
-        <span class="text-xl pl-1">🍓</span>
-        <div class="flex-1">
-          <label for="playerNameInput" class="block text-[10px] font-bold uppercase tracking-wider text-pink-400">Sweetie Nickname</label>
-          <input id="playerNameInput" type="text" maxlength="15" placeholder="e.g. SugarPuff" class="w-full bg-transparent font-bold text-pink-700 text-sm focus:outline-none placeholder-pink-300" />
-        </div>
-        <button id="randomNameBtn" title="Randomize name" class="px-2.5 py-1.5 bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-xl text-xs font-bold active:scale-95 transition">🎲</button>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button id="startBtn" class="flex-1 py-4 rounded-3xl font-black text-lg sm:text-xl uppercase tracking-wider bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 candy-btn-shadow border-3 border-white text-white flex items-center justify-center space-x-2 transition-all">
-          <span>Let's Feast!</span>
-          <span class="text-2xl">🍰✨</span>
-        </button>
-      </div>
-
-      <div class="text-xs text-pink-500 font-bold">
-        🌸 Coiling around your own body is 100% safe — wrap up to protect your sweets!
-      </div>
+      <button class="play-btn" id="start-btn">PLAY NOW ✨</button>
     </div>
   </div>
 
   <!-- Game Over Screen -->
-  <div id="gameOverScreen" class="absolute inset-0 z-30 flex items-center justify-center bg-pink-950/40 backdrop-blur-md hidden px-4">
-    <div class="max-w-sm w-full bg-white/95 border-4 border-pink-300 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
-      <div class="w-20 h-20 rounded-full bg-pink-100 border-3 border-pink-300 flex items-center justify-center mx-auto text-4xl animate-wiggle">
-        🥺🧁
-      </div>
-      <div>
-        <h2 class="text-3xl font-black text-pink-600 tracking-wide">SUGAR CRASH!</h2>
-        <p id="deathCause" class="text-xs font-bold text-pink-400 mt-1">You bumped into a sweetie snake.</p>
-      </div>
-
-      <div class="bg-pink-50 rounded-2xl p-4 border-2 border-pink-200 flex justify-around">
-        <div>
-          <div class="text-[11px] text-pink-400 font-bold uppercase">Dessert Score</div>
-          <div id="finalScoreVal" class="text-2xl font-black text-pink-600">0</div>
-        </div>
-        <div class="h-10 w-0.5 bg-pink-200"></div>
-        <div>
-          <div class="text-[11px] text-purple-400 font-bold uppercase">Sweeties Defeated</div>
-          <div id="finalKillsVal" class="text-2xl font-black text-purple-600">0 🏆</div>
-        </div>
-      </div>
-
-      <!-- Change Name On Game Over -->
-      <div class="bg-pink-50/80 p-2.5 rounded-2xl border border-pink-200 flex items-center space-x-2 text-left">
-        <span class="text-lg pl-1">🎀</span>
-        <div class="flex-1">
-          <label for="gameOverNameInput" class="block text-[10px] font-bold uppercase tracking-wider text-pink-400">Play As</label>
-          <input id="gameOverNameInput" type="text" maxlength="15" class="w-full bg-transparent font-bold text-pink-700 text-sm focus:outline-none placeholder-pink-300" />
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-2.5">
-        <button id="respawnBtn" class="w-full py-3.5 rounded-2xl font-black uppercase tracking-wider bg-gradient-to-r from-pink-400 to-purple-400 text-white candy-btn-shadow border-2 border-white active:scale-95 transition">
-          🍓 Have Another Treat!
-        </button>
-      </div>
-
-      <div class="text-[11px] text-pink-400 font-bold uppercase tracking-widest">
-        Sweetie Slither by Luke Chiu
-      </div>
+  <div id="gameover-screen">
+    <div class="gameover-box">
+      <div style="font-size: 48px; margin-bottom: 6px;">💥🍰</div>
+      <h2 class="gameover-title">Crumbly Defeat!</h2>
+      <p class="final-score">Final Sugar Score<span id="final-score-val">0</span></p>
+      <button class="play-btn" id="restart-btn">TRY AGAIN 🍓</button>
     </div>
   </div>
 
-  <!-- Audio Synthesizer (Tone.js via CDN) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
-
   <script>
-    /* ========================================================
-       GAME CONSTANTS & CONFIGURATION
-       ======================================================== */
-    const WORLD_WIDTH = 3400;
-    const WORLD_HEIGHT = 3400;
-    const WORLD_RADIUS = 1600; // Circular arena bounds
-    const INITIAL_SNAKE_LENGTH = 28;
-    const SEGMENT_DISTANCE = 12;
-    const BASE_SPEED = 3.6;
-    const BOOST_SPEED = 7.2;
-    const BOT_COUNT = 15;
-    const FOOD_COUNT = 340;
-
-    // Dessert Varieties List
-    const DESSERT_TYPES = [
-      { name: 'Cupcake', icon: '🧁', val: 2, radius: 14, color: '#f472b6' },
-      { name: 'Donut', icon: '🍩', val: 3, radius: 15, color: '#fb7185' },
-      { name: 'Strawberry', icon: '🍓', val: 1.5, radius: 12, color: '#ef4444' },
-      { name: 'Boba', icon: '🧋', val: 3.5, radius: 16, color: '#d97706' },
-      { name: 'Macaron', icon: '🍪', val: 2, radius: 13, color: '#c084fc' },
-      { name: 'Ice Cream', icon: '🍦', val: 2.5, radius: 15, color: '#38bdf8' },
-      { name: 'Lollipop', icon: '🍭', val: 2, radius: 14, color: '#f43f5e' },
-      { name: 'Cake Slice', icon: '🍰', val: 4, radius: 17, color: '#ec4899' },
-      { name: 'Candy', icon: '🍬', val: 1, radius: 11, color: '#a855f7' },
-      { name: 'Pudding', icon: '🍮', val: 3, radius: 15, color: '#eab308' }
-    ];
-
-    // Canvas setup
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const minimapCanvas = document.getElementById('minimapCanvas');
-    const minimapCtx = minimapCanvas.getContext('2d');
 
-    // UI Elements
-    const introScreen = document.getElementById('introScreen');
-    const hudLayer = document.getElementById('hudLayer');
-    const gameOverScreen = document.getElementById('gameOverScreen');
-    const startBtn = document.getElementById('startBtn');
-    const respawnBtn = document.getElementById('respawnBtn');
-    const playerNameInput = document.getElementById('playerNameInput');
-    const gameOverNameInput = document.getElementById('gameOverNameInput');
-    const randomNameBtn = document.getElementById('randomNameBtn');
-    const scoreVal = document.getElementById('scoreVal');
-    const lengthVal = document.getElementById('lengthVal');
-    const enemiesCountVal = document.getElementById('enemiesCountVal');
-    const leaderboardList = document.getElementById('leaderboardList');
-    const minimapContainer = document.getElementById('minimapContainer');
-    const deathCause = document.getElementById('deathCause');
-    const finalScoreVal = document.getElementById('finalScoreVal');
-    const finalKillsVal = document.getElementById('finalKillsVal');
-    const boostBtn = document.getElementById('boostBtn');
-    const joystickZone = document.getElementById('joystickZone');
-    const joystickKnob = document.getElementById('joystickKnob');
+    // UI elements
+    const scoreValEl = document.getElementById('score-val');
+    const leaderboardListEl = document.getElementById('leaderboard-list');
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const nicknameInput = document.getElementById('nickname-input');
+    const gameoverScreen = document.getElementById('gameover-screen');
+    const restartBtn = document.getElementById('restart-btn');
+    const finalScoreVal = document.getElementById('final-score-val');
+    const joystickBase = document.getElementById('joystick-base');
+    const joystickStick = document.getElementById('joystick-stick');
+    const rushBtn = document.getElementById('rush-btn');
 
-    // Sweet Web Audio using Tone.js
-    let sfxInitialized = false;
-    let eatSynth, boostSynth, deathSynth;
+    // Arena Settings
+    const ARENA_RADIUS = 1800; // Big circular arena
+    const ARENA_CENTER = { x: 0, y: 0 };
+    const FOOD_COUNT = 340;
+
+    // Viewport & Scale
+    let screenW = window.innerWidth;
+    let screenH = window.innerHeight;
+
+    function resizeCanvas() {
+      screenW = window.innerWidth;
+      screenH = window.innerHeight;
+      canvas.width = screenW;
+      canvas.height = screenH;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Audio SFX synthesis
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
 
     function initAudio() {
-      if (sfxInitialized) return;
+      if (!audioCtx) audioCtx = new AudioContext();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.12, gainLvl = 0.15) {
+      if (!audioCtx) return;
       try {
-        // High-pitched marimba/celesta style cute chime
-        eatSynth = new Tone.PolySynth(Tone.Synth, {
-          oscillator: { type: "triangle" },
-          envelope: { attack: 0.005, decay: 0.15, sustain: 0.02, release: 0.12 }
-        }).toDestination();
-        eatSynth.volume.value = -8;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainLvl, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
 
-        boostSynth = new Tone.PolySynth(Tone.Synth, {
-          oscillator: { type: "sine" },
-          envelope: { attack: 0.05, decay: 0.2, sustain: 0.1, release: 0.2 }
-        }).toDestination();
-        boostSynth.volume.value = -18;
+    function soundEat() {
+      playTone(600 + Math.random() * 250, 'triangle', 0.08, 0.12);
+    }
 
-        deathSynth = new Tone.PolySynth(Tone.Synth, {
-          oscillator: { type: "sawtooth" },
-          envelope: { attack: 0.01, decay: 0.3, sustain: 0, release: 0.2 }
-        }).toDestination();
-        deathSynth.volume.value = -10;
+    function soundDefeatEnemy() {
+      if (!audioCtx) return;
+      [400, 600, 850, 1100].forEach((f, idx) => {
+        setTimeout(() => playTone(f, 'sine', 0.16, 0.18), idx * 60);
+      });
+    }
 
-        Tone.start();
-        sfxInitialized = true;
-      } catch (err) {
-        console.warn("Audio init postponed", err);
+    function soundGameOver() {
+      if (!audioCtx) return;
+      [440, 370, 310, 240].forEach((f, idx) => {
+        setTimeout(() => playTone(f, 'sawtooth', 0.22, 0.2), idx * 80);
+      });
+    }
+
+    // Food Types & Sprites
+    const DESSERT_TYPES = [
+      { emoji: '🍓', glow: 'rgba(255, 105, 140, 0.4)', stroke: '#ff4d79', points: 15, radius: 19 },
+      { emoji: '🍩', glow: 'rgba(210, 140, 90, 0.4)',  stroke: '#cd853f', points: 20, radius: 20 },
+      { emoji: '🍰', glow: 'rgba(255, 180, 200, 0.4)', stroke: '#ff6699', points: 30, radius: 21 },
+      { emoji: '🧁', glow: 'rgba(200, 160, 255, 0.4)', stroke: '#b366ff', points: 25, radius: 20 },
+      { emoji: '🧋', glow: 'rgba(230, 175, 130, 0.4)', stroke: '#d29966', points: 35, radius: 22 },
+      { emoji: '🍪', glow: 'rgba(218, 165, 32, 0.4)',  stroke: '#d49b38', points: 10, radius: 18 },
+      { emoji: '🍭', glow: 'rgba(120, 220, 255, 0.4)', stroke: '#40c0e0', points: 15, radius: 19 }
+    ];
+
+    // Dark Enemy Palettes (Deep, moody, high-contrast dark colors)
+    const DARK_ENEMY_PALETTES = [
+      {
+        // Dark Obsidian / Midnight
+        primary: '#1c1b24',
+        secondary: '#2e2a3b',
+        border: '#453f57',
+        glow: 'rgba(69, 63, 87, 0.4)',
+        eyeGlow: '#a855f7',
+        horn: '🪨'
+      },
+      {
+        // Deep Dark Chocolate / Espresso
+        primary: '#24140e',
+        secondary: '#3d2419',
+        border: '#5c3826',
+        glow: 'rgba(92, 56, 38, 0.4)',
+        eyeGlow: '#fb923c',
+        horn: '☕'
+      },
+      {
+        // Dark Crimson / Blood Cherry
+        primary: '#2e0a14',
+        secondary: '#4a1222',
+        border: '#731c35',
+        glow: 'rgba(115, 28, 53, 0.45)',
+        eyeGlow: '#f43f5e',
+        horn: '🍒'
+      },
+      {
+        // Dark Midnight Teal / Abyssal Blue
+        primary: '#091e24',
+        secondary: '#11353f',
+        border: '#1f5363',
+        glow: 'rgba(31, 83, 99, 0.45)',
+        eyeGlow: '#38bdf8',
+        horn: '🫐'
+      }
+    ];
+
+    // AI Personalities & Configuration
+    const AI_CONFIGS = [
+      { name: 'Dark Choco', personality: 'HUNTER',    paletteIdx: 1 },
+      { name: 'Shadow Plum',personality: 'GLUTTON',   paletteIdx: 0 },
+      { name: 'Black Cherry',personality: 'AMBUSHER', paletteIdx: 2 },
+      { name: 'Abyss Berry',personality: 'TRICKSTER', paletteIdx: 3 }
+    ];
+
+    // Food Pool
+    let foods = [];
+
+    function spawnFood(forceX = null, forceY = null, customType = null) {
+      let x, y;
+      if (forceX !== null && forceY !== null) {
+        x = forceX;
+        y = forceY;
+      } else {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.sqrt(Math.random()) * (ARENA_RADIUS - 70);
+        x = Math.cos(angle) * dist;
+        y = Math.sin(angle) * dist;
+      }
+      const type = customType || DESSERT_TYPES[Math.floor(Math.random() * DESSERT_TYPES.length)];
+      return {
+        x,
+        y,
+        type,
+        pulseOffset: Math.random() * Math.PI * 2,
+        size: type.radius
+      };
+    }
+
+    function initFoodCluster() {
+      foods = [];
+      for (let i = 0; i < FOOD_COUNT; i++) {
+        foods.push(spawnFood());
       }
     }
 
-    function playEatSound() {
-      if (!sfxInitialized || Tone.context.state !== 'running') return;
-      const notes = ["C6", "E6", "G6", "A6", "C7"];
-      const note = notes[Math.floor(Math.random() * notes.length)];
-      eatSynth.triggerAttackRelease(note, "32n");
-    }
-
-    function playKillSound() {
-      if (!sfxInitialized || Tone.context.state !== 'running') return;
-      deathSynth.triggerAttackRelease(["C4", "A3", "F3"], "16n");
-    }
-
-    /* ========================================================
-       RESIZE HANDLER
-       ======================================================== */
-    let screenWidth = window.innerWidth;
-    let screenHeight = window.innerHeight;
-
-    function handleResize() {
-      screenWidth = window.innerWidth;
-      screenHeight = window.innerHeight;
-      canvas.width = screenWidth;
-      canvas.height = screenHeight;
-    }
-    window.addEventListener('resize', handleResize);
-    handleResize();
-
-    /* ========================================================
-       VECTOR MATH HELPERS
-       ======================================================== */
-    function normalizeAngle(angle) {
-      while (angle < -Math.PI) angle += Math.PI * 2;
-      while (angle > Math.PI) angle -= Math.PI * 2;
-      return angle;
-    }
-
-    function lerp(start, end, amt) {
-      return (1 - amt) * start + amt * end;
-    }
-
-    function getDistance(x1, y1, x2, y2) {
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    /* ========================================================
-       DESSERT FOOD CLASS (Delicious treats with emoji & sparkles)
-       ======================================================== */
-    class DessertFood {
-      constructor(x, y, dessertData = null) {
-        this.x = x;
-        this.y = y;
-        const chosen = dessertData || DESSERT_TYPES[Math.floor(Math.random() * DESSERT_TYPES.length)];
-        this.name = chosen.name;
-        this.icon = chosen.icon;
-        this.value = chosen.val;
-        this.baseRadius = chosen.radius;
-        this.color = chosen.color;
-        this.pulse = Math.random() * Math.PI * 2;
-        this.pulseSpeed = 0.04 + Math.random() * 0.04;
-      }
-
-      update() {
-        this.pulse += this.pulseSpeed;
-      }
-
-      draw(ctx, camX, camY) {
-        const screenX = this.x - camX + screenWidth / 2;
-        const screenY = this.y - camY + screenHeight / 2;
-
-        // Viewport culling
-        if (screenX < -30 || screenX > screenWidth + 30 || screenY < -30 || screenY > screenHeight + 30) {
-          return;
-        }
-
-        const bounce = Math.sin(this.pulse) * 2;
-        const drawRadius = this.baseRadius + bounce;
-
-        // Cute soft pastel aura
-        ctx.beginPath();
-        ctx.arc(screenX, screenY + bounce, drawRadius * 1.35, 0, Math.PI * 2);
-        ctx.fillStyle = this.color + '40';
-        ctx.fill();
-
-        // White pastry plate/glow base
-        ctx.beginPath();
-        ctx.arc(screenX, screenY + bounce, drawRadius, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = this.color;
-        ctx.shadowBlur = 8;
-        ctx.fill();
-        ctx.shadowBlur = 0; // reset
-
-        // Draw Dessert Icon / Emoji
-        ctx.font = `${Math.floor(drawRadius * 1.3)}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.icon, screenX, screenY + bounce + 1);
-
-        // Tiny cute sparkle on top
-        if (Math.sin(this.pulse * 2) > 0.6) {
-          ctx.font = '9px sans-serif';
-          ctx.fillText('✨', screenX + drawRadius * 0.7, screenY - drawRadius * 0.5 + bounce);
-        }
+    // Floating Particles System
+    let particles = [];
+    function emitSweetBurst(x, y, count = 16, color = '#ff4d79') {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.8 + Math.random() * 5.2;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: 4 + Math.random() * 6,
+          color,
+          alpha: 1.0,
+          decay: 0.02 + Math.random() * 0.03
+        });
       }
     }
 
-    /* ========================================================
-       CUTE KAWAII SNAKE CLASS
-       ======================================================== */
-    class CuteSnake {
-      constructor(x, y, name, isPlayer = false, colors = { primary: '#f472b6', secondary: '#fda4af', blush: '#fb7185', hat: '🍓' }) {
+    // Snake Class
+    class Snake {
+      constructor(x, y, name, isAI = false, aiConfig = null) {
+        this.isAI = isAI;
         this.name = name;
-        this.isPlayer = isPlayer;
+        this.aiConfig = aiConfig;
         this.x = x;
         this.y = y;
         this.angle = Math.random() * Math.PI * 2;
         this.targetAngle = this.angle;
-        this.turnRate = 0.088;
-        this.baseSpeed = BASE_SPEED;
-        this.boostSpeed = BOOST_SPEED;
+        this.baseSpeed = 3.6;
+        this.rushSpeed = 6.8;
         this.isBoosting = false;
-        this.speed = this.baseSpeed;
-        this.radius = 14; // Round chubby body radius
-        this.length = INITIAL_SNAKE_LENGTH;
-        this.score = 100;
-        this.isDead = false;
+        this.radius = 24;
+        this.score = 300;
+        this.dead = false;
 
-        this.colors = colors;
-        this.accessory = colors.hat || '🎀';
+        // Custom appearance
+        if (!isAI) {
+          // Cute Player Colors (Strawberry pink / blush cream)
+          this.colors = {
+            primary: '#ff3d74',
+            secondary: '#ff7fa6',
+            cream: '#ffffff',
+            border: '#ffadc3',
+            glow: 'rgba(255, 61, 116, 0.45)',
+            eyeGlow: '#fff',
+            topping: '🍓'
+          };
+        } else {
+          // Dark Enemy Palettes
+          const pal = DARK_ENEMY_PALETTES[aiConfig.paletteIdx % DARK_ENEMY_PALETTES.length];
+          this.colors = {
+            primary: pal.primary,
+            secondary: pal.secondary,
+            cream: '#3a3347',
+            border: pal.border,
+            glow: pal.glow,
+            eyeGlow: pal.eyeGlow,
+            topping: pal.horn
+          };
+        }
 
-        // Segments array storing vector points
-        this.segments = [];
+        this.history = [];
+        this.length = 26;
+
+        // Populate initial body history
+        const segDist = 8;
+        for (let i = 0; i < this.length * segDist; i++) {
+          this.history.push({
+            x: this.x - Math.cos(this.angle) * i,
+            y: this.y - Math.sin(this.angle) * i
+          });
+        }
+
+        // AI behavior state variables
+        this.aiTimer = 0;
+        this.aiTurnRate = 0.07;
+        this.state = 'FORAGING';
+      }
+
+      getSegmentPositions() {
+        const segSpacing = 9;
+        const positions = [];
         for (let i = 0; i < this.length; i++) {
-          this.segments.push({
-            x: this.x - Math.cos(this.angle) * (i * SEGMENT_DISTANCE),
-            y: this.y - Math.sin(this.angle) * (i * SEGMENT_DISTANCE),
-            angle: this.angle
-          });
+          const index = i * segSpacing;
+          if (index < this.history.length) {
+            positions.push(this.history[index]);
+          }
         }
-
-        // Star & heart trail particles when rushing
-        this.sugarSparks = [];
-
-        // Bot AI behavior
-        this.aiChangeTimer = 0;
-        this.aiTargetFood = null;
+        return positions;
       }
 
-      update(foodList, allSnakes) {
-        if (this.isDead) return;
-
-        // Smooth 360-degree angle interpolation
-        let diff = normalizeAngle(this.targetAngle - this.angle);
-        this.angle += diff * this.turnRate;
-        this.angle = normalizeAngle(this.angle);
-
-        // Boost velocity & tiny treat dropping
-        if (this.isBoosting && this.length > 15) {
-          this.speed = lerp(this.speed, this.boostSpeed, 0.16);
-          // Drop sweet crumb when sprinting
-          if (Math.random() < 0.16) {
-            this.length = Math.max(15, this.length - 0.08);
-            this.score = Math.max(50, this.score - 0.5);
-            const tail = this.segments[this.segments.length - 1];
-            if (foodList.length < FOOD_COUNT + 100) {
-              foodList.push(new DessertFood(tail.x, tail.y, DESSERT_TYPES[8])); // Candy drop
-            }
-          }
-        } else {
-          this.isBoosting = false;
-          this.speed = lerp(this.speed, this.baseSpeed, 0.15);
-        }
-
-        // Advance head vector
-        this.x += Math.cos(this.angle) * this.speed;
-        this.y += Math.sin(this.angle) * this.speed;
-
-        // Arena boundary soft spring
-        const distFromCenter = Math.hypot(this.x, this.y);
-        if (distFromCenter > WORLD_RADIUS - 35) {
-          const pushAngle = Math.atan2(-this.y, -this.x);
-          this.targetAngle = pushAngle;
-          if (distFromCenter > WORLD_RADIUS) {
-            this.x = (this.x / distFromCenter) * WORLD_RADIUS;
-            this.y = (this.y / distFromCenter) * WORLD_RADIUS;
-          }
-        }
-
-        // Inverse kinematics segment update
-        let leaderX = this.x;
-        let leaderY = this.y;
-
-        for (let i = 0; i < this.segments.length; i++) {
-          const seg = this.segments[i];
-          const dx = leaderX - seg.x;
-          const dy = leaderY - seg.y;
-          const dist = Math.hypot(dx, dy);
-
-          if (dist > SEGMENT_DISTANCE) {
-            const segAngle = Math.atan2(dy, dx);
-            seg.x = leaderX - Math.cos(segAngle) * SEGMENT_DISTANCE;
-            seg.y = leaderY - Math.sin(segAngle) * SEGMENT_DISTANCE;
-            seg.angle = segAngle;
-          }
-
-          leaderX = seg.x;
-          leaderY = seg.y;
-        }
-
-        // Grow/Shrink segments
-        while (this.segments.length < Math.floor(this.length)) {
-          const last = this.segments[this.segments.length - 1];
-          this.segments.push({ x: last.x, y: last.y, angle: last.angle });
-        }
-        while (this.segments.length > Math.floor(this.length)) {
-          this.segments.pop();
-        }
-
-        // Sugar rush heart & sprinkle particles
-        if (this.isBoosting && Math.random() < 0.45) {
-          const tail = this.segments[this.segments.length - 1];
-          const icons = ['✨', '💖', '⭐', '🌸'];
-          this.sugarSparks.push({
-            x: tail.x + (Math.random() - 0.5) * 14,
-            y: tail.y + (Math.random() - 0.5) * 14,
-            icon: icons[Math.floor(Math.random() * icons.length)],
-            life: 1.0,
-            scale: 0.8 + Math.random() * 0.5
-          });
-        }
-
-        for (let i = this.sugarSparks.length - 1; i >= 0; i--) {
-          const spk = this.sugarSparks[i];
-          spk.life -= 0.05;
-          if (spk.life <= 0) this.sugarSparks.splice(i, 1);
-        }
-
-        // Bot AI behavior
-        if (!this.isPlayer) {
-          this.updateAI(foodList, allSnakes);
-        }
-      }
-
-      updateAI(foodList, allSnakes) {
-        this.aiChangeTimer--;
-
-        // Avoid enemy bodies
-        let dangerDetected = false;
-        const forwardProbeDist = 75;
-        const probeX = this.x + Math.cos(this.angle) * forwardProbeDist;
-        const probeY = this.y + Math.sin(this.angle) * forwardProbeDist;
-
-        for (let other of allSnakes) {
-          if (other === this || other.isDead) continue;
-          for (let k = 0; k < other.segments.length; k += 2) {
-            const seg = other.segments[k];
-            if (getDistance(probeX, probeY, seg.x, seg.y) < this.radius + other.radius + 22) {
-              dangerDetected = true;
-              const awayAngle = Math.atan2(this.y - seg.y, this.x - seg.x);
-              this.targetAngle = awayAngle + (Math.random() - 0.5) * 0.4;
-              break;
-            }
-          }
-          if (dangerDetected) break;
-        }
-
-        if (dangerDetected) {
-          this.aiChangeTimer = 16;
-          return;
-        }
-
-        // Head toward nearest sweet dessert
-        if (this.aiChangeTimer <= 0) {
-          this.aiChangeTimer = 45 + Math.floor(Math.random() * 40);
-
-          let closestDist = 480;
-          let bestSweet = null;
-          for (let f of foodList) {
-            const d = getDistance(this.x, this.y, f.x, f.y);
-            if (d < closestDist) {
-              closestDist = d;
-              bestSweet = f;
-            }
-          }
-
-          if (bestSweet) {
-            this.targetAngle = Math.atan2(bestSweet.y - this.y, bestSweet.x - this.x);
-            this.isBoosting = (bestSweet.value >= 3 && Math.random() < 0.4 && this.length > 25);
-          } else {
-            const centerAngle = Math.atan2(-this.y, -this.x);
-            this.targetAngle = centerAngle + (Math.random() - 0.5) * 1.5;
-            this.isBoosting = false;
-          }
-        }
-      }
-
-      draw(ctx, camX, camY) {
-        if (this.isDead) return;
-
-        // Sugar Rush Sprites
-        for (const spk of this.sugarSparks) {
-          const sx = spk.x - camX + screenWidth / 2;
-          const sy = spk.y - camY + screenHeight / 2;
-          ctx.font = `${Math.floor(14 * spk.scale)}px sans-serif`;
-          ctx.globalAlpha = Math.max(0, spk.life);
-          ctx.fillText(spk.icon, sx, sy);
-          ctx.globalAlpha = 1.0;
-        }
-
-        // Draw Chubby Marshmallow Body Segments (Back to Front)
-        for (let i = this.segments.length - 1; i >= 0; i--) {
-          const seg = this.segments[i];
-          const sx = seg.x - camX + screenWidth / 2;
-          const sy = seg.y - camY + screenHeight / 2;
-
-          if (sx < -40 || sx > screenWidth + 40 || sy < -40 || sy > screenHeight + 40) {
-            continue;
-          }
-
-          const taper = (i / this.segments.length);
-          const segRadius = Math.max(7, this.radius * (1 - taper * 0.35));
-          const segColor = (i % 3 === 0) ? this.colors.secondary : this.colors.primary;
-
-          // Cute soft outer shadow/frosting
-          ctx.beginPath();
-          ctx.arc(sx, sy, segRadius + 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#ffffffbb';
-          ctx.fill();
-
-          // Body bead
-          ctx.beginPath();
-          ctx.arc(sx, sy, segRadius, 0, Math.PI * 2);
-          ctx.fillStyle = segColor;
-          ctx.fill();
-
-          // Sprinkle dots on random segments
-          if (i % 4 === 1) {
-            ctx.beginPath();
-            ctx.arc(sx - 3, sy - 2, 2.2, 0, Math.PI * 2);
-            ctx.fillStyle = '#fde047'; // yellow sprinkle
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(sx + 3, sy + 2, 1.8, 0, Math.PI * 2);
-            ctx.fillStyle = '#38bdf8'; // blue sprinkle
-            ctx.fill();
-          }
-
-          // Glossy highlight
-          ctx.beginPath();
-          ctx.arc(sx - segRadius * 0.3, sy - segRadius * 0.3, segRadius * 0.4, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
-          ctx.fill();
-        }
-
-        // Draw Kawaii Head
-        const hx = this.x - camX + screenWidth / 2;
-        const hy = this.y - camY + screenHeight / 2;
-
-        // Head Outer Glow
-        ctx.beginPath();
-        ctx.arc(hx, hy, this.radius + 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.fill();
-
-        // Head Base
-        ctx.beginPath();
-        ctx.arc(hx, hy, this.radius + 1, 0, Math.PI * 2);
-        ctx.fillStyle = this.colors.primary;
-        ctx.fill();
-
-        // Cute Anime Sparkling Eyes
-        const eyeOffsetDist = this.radius * 0.52;
-        const eyeAngleOffset = 0.75;
-        const eyeRadius = 4.8;
-
-        const leftEyeX = hx + Math.cos(this.angle - eyeAngleOffset) * eyeOffsetDist;
-        const leftEyeY = hy + Math.sin(this.angle - eyeAngleOffset) * eyeOffsetDist;
-        const rightEyeX = hx + Math.cos(this.angle + eyeAngleOffset) * eyeOffsetDist;
-        const rightEyeY = hy + Math.sin(this.angle + eyeAngleOffset) * eyeOffsetDist;
-
-        // Eye Backing (Dark anime eyes)
-        ctx.fillStyle = '#1e1b4b';
-        ctx.beginPath();
-        ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2);
-        ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Eye Big Shimmer / Star highlight
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(leftEyeX - 1.2, leftEyeY - 1.2, 2.2, 0, Math.PI * 2);
-        ctx.arc(rightEyeX - 1.2, rightEyeY - 1.2, 2.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Eye Tiny secondary shimmer
-        ctx.beginPath();
-        ctx.arc(leftEyeX + 1.2, leftEyeY + 1.2, 1.1, 0, Math.PI * 2);
-        ctx.arc(rightEyeX + 1.2, rightEyeY + 1.2, 1.1, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Cute Anime Rosy Blush Cheeks (Blushing pink ovals)
-        const blushDist = this.radius * 0.85;
-        const blushAngleOffset = 1.15;
-        const leftBlushX = hx + Math.cos(this.angle - blushAngleOffset) * blushDist;
-        const leftBlushY = hy + Math.sin(this.angle - blushAngleOffset) * blushDist;
-        const rightBlushX = hx + Math.cos(this.angle + blushAngleOffset) * blushDist;
-        const rightBlushY = hy + Math.sin(this.angle + blushAngleOffset) * blushDist;
-
-        ctx.fillStyle = 'rgba(244, 63, 94, 0.55)';
-        ctx.beginPath();
-        ctx.ellipse(leftBlushX, leftBlushY, 3.8, 2.4, this.angle, 0, Math.PI * 2);
-        ctx.ellipse(rightBlushX, rightBlushY, 3.8, 2.4, this.angle, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Cute Little Smile / Nose
-        const snoutX = hx + Math.cos(this.angle) * (this.radius * 0.7);
-        const snoutY = hy + Math.sin(this.angle) * (this.radius * 0.7);
-        ctx.fillStyle = '#db2777';
-        ctx.beginPath();
-        ctx.arc(snoutX, snoutY, 1.8, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Cute Hat / Accessory (Chef hat, strawberry, ribbon bow)
-        const hatX = hx - Math.cos(this.angle) * (this.radius * 0.4);
-        const hatY = hy - Math.sin(this.angle) * (this.radius * 0.4) - 9;
-        ctx.font = '16px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.accessory, hatX, hatY);
-
-        // Cute Name Tag with heart
-        ctx.font = 'bold 12px Fredoka, sans-serif';
-        ctx.fillStyle = this.isPlayer ? '#db2777' : '#7c3aed';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${this.name}`, hx, hy - this.radius - 16);
-      }
-    }
-
-    /* ========================================================
-       GAME ENGINE & ARENA LOGIC
-       ======================================================== */
-    class GameEngine {
-      constructor() {
-        this.camera = { x: 0, y: 0 };
-        this.snakes = [];
-        this.food = [];
-        this.player = null;
-        this.playerName = 'SugarPuff';
-        this.isRunning = false;
-        this.isGameOver = false;
-        this.kills = 0;
-        this.roundScore = 0;
-
-        // Load saved nickname or pick a random cute default
-        const savedName = localStorage.getItem('sweetie_snake_name');
-        const defaultNames = ['SugarPuff', 'Mochi', 'BerryBite', 'HoneyBun', 'CottonFluff', 'SweetiePie', 'DonutDolly'];
-        this.playerName = savedName || defaultNames[Math.floor(Math.random() * defaultNames.length)];
-        if (playerNameInput) playerNameInput.value = this.playerName;
-        if (gameOverNameInput) gameOverNameInput.value = this.playerName;
-
-        // Input Tracking
-        this.keys = {
-          ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false,
-          KeyW: false, KeyS: false, KeyA: false, KeyD: false,
-          Space: false
-        };
-
-        this.mousePos = { x: screenWidth / 2, y: screenHeight / 2 };
-        this.useMouseSteering = false;
-
-        this.joystickActive = false;
-        this.joystickVector = { x: 0, y: 0 };
-
-        this.initControls();
-      }
-
-      initControls() {
-        window.addEventListener('keydown', (e) => {
-          if (this.keys.hasOwnProperty(e.code)) {
-            this.keys[e.code] = true;
-            this.useMouseSteering = false;
-          }
-          if (e.code === 'Space' && this.player) {
-            this.player.isBoosting = true;
-          }
-        });
-
-        window.addEventListener('keyup', (e) => {
-          if (this.keys.hasOwnProperty(e.code)) {
-            this.keys[e.code] = false;
-          }
-          if (e.code === 'Space' && this.player) {
-            this.player.isBoosting = false;
-          }
-        });
-
-        window.addEventListener('mousemove', (e) => {
-          this.mousePos.x = e.clientX;
-          this.mousePos.y = e.clientY;
-          if (!this.joystickActive && this.isRunning) {
-            this.useMouseSteering = true;
-          }
-        });
-
-        window.addEventListener('mousedown', (e) => {
-          if (e.target.closest('#hudLayer') && !e.target.closest('#gameCanvas')) return;
-          if (this.player && this.isRunning) {
-            this.player.isBoosting = true;
-          }
-        });
-
-        window.addEventListener('mouseup', () => {
-          if (this.player) {
-            this.player.isBoosting = false;
-          }
-        });
-
-        // Joystick Handling
-        const handleJoystickMove = (clientX, clientY) => {
-          const rect = joystickZone.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
-          const maxDist = rect.width / 2 - 10;
-
-          const dx = clientX - centerX;
-          const dy = clientY - centerY;
-          const dist = Math.hypot(dx, dy);
-
-          if (dist > 0) {
-            const angle = Math.atan2(dy, dx);
-            const clampedDist = Math.min(dist, maxDist);
-            const knobX = Math.cos(angle) * clampedDist;
-            const knobY = Math.sin(angle) * clampedDist;
-
-            joystickKnob.style.transform = `translate(${knobX}px, ${knobY}px)`;
-            this.joystickVector = { x: Math.cos(angle), y: Math.sin(angle) };
-            this.joystickActive = true;
-            this.useMouseSteering = false;
-
-            if (this.player) {
-              this.player.targetAngle = angle;
-            }
-          }
-        };
-
-        const resetJoystick = () => {
-          this.joystickActive = false;
-          this.joystickVector = { x: 0, y: 0 };
-          joystickKnob.style.transform = `translate(0px, 0px)`;
-        };
-
-        joystickZone.addEventListener('pointerdown', (e) => {
-          joystickZone.setPointerCapture(e.pointerId);
-          this.joystickActive = true;
-          handleJoystickMove(e.clientX, e.clientY);
-        });
-
-        joystickZone.addEventListener('pointermove', (e) => {
-          if (this.joystickActive) {
-            handleJoystickMove(e.clientX, e.clientY);
-          }
-        });
-
-        joystickZone.addEventListener('pointerup', resetJoystick);
-        joystickZone.addEventListener('pointercancel', resetJoystick);
-
-        // Boost / Sugar Rush Button
-        boostBtn.addEventListener('pointerdown', (e) => {
-          e.preventDefault();
-          if (this.player) this.player.isBoosting = true;
-        });
-
-        boostBtn.addEventListener('pointerup', (e) => {
-          e.preventDefault();
-          if (this.player) this.player.isBoosting = false;
-        });
-
-        boostBtn.addEventListener('pointerleave', () => {
-          if (this.player) this.player.isBoosting = false;
-        });
-      }
-
-      spawnPlayer() {
-        // Player: Custom cute sweetie snake
-        this.player = new CuteSnake(0, 0, this.playerName, true, {
-          primary: '#f472b6',
-          secondary: '#fda4af',
-          blush: '#fb7185',
-          hat: '🍓'
-        });
-        this.snakes = [this.player];
-        this.kills = 0;
-        this.roundScore = 0;
-        this.isGameOver = false;
-
-        // Cute bot names & themes
-        const botThemes = [
-          { name: 'Mochi Roll', primary: '#a78bfa', secondary: '#c4b5fd', hat: '🎀' },
-          { name: 'Pudding Pop', primary: '#facc15', secondary: '#fef08a', hat: '🍮' },
-          { name: 'Boba Bear', primary: '#fb923c', secondary: '#fdba74', hat: '🧋' },
-          { name: 'Berry Bunny', primary: '#f43f5e', secondary: '#fda4af', hat: '🍒' },
-          { name: 'Mint Macaron', primary: '#34d399', secondary: '#a7f3d0', hat: '🍪' },
-          { name: 'Sugar Fluff', primary: '#38bdf8', secondary: '#bae6fd', hat: '🧁' },
-          { name: 'Honey Glaze', primary: '#fbbf24', secondary: '#fde68a', hat: '🍯' },
-          { name: 'Cotton Candy', primary: '#ec4899', secondary: '#fbcfe8', hat: '🍬' },
-          { name: 'Choco Puff', primary: '#b45309', secondary: '#fcd34d', hat: '🍫' },
-          { name: 'Peach Tart', primary: '#fb7185', secondary: '#fecdd3', hat: '🍑' },
-          { name: 'Matcha Swirl', primary: '#4ade80', secondary: '#bbf7d0', hat: '🍵' },
-          { name: 'Vanilla Bean', primary: '#e2e8f0', secondary: '#f8fafc', hat: '🍦' }
-        ];
-
-        for (let i = 0; i < BOT_COUNT; i++) {
-          const spawnAngle = Math.random() * Math.PI * 2;
-          const spawnDist = 350 + Math.random() * (WORLD_RADIUS - 550);
-          const bx = Math.cos(spawnAngle) * spawnDist;
-          const by = Math.sin(spawnAngle) * spawnDist;
-          const theme = botThemes[i % botThemes.length];
-          const bot = new CuteSnake(bx, by, theme.name, false, theme);
-          bot.length = 20 + Math.floor(Math.random() * 30);
-          bot.score = Math.floor(bot.length * 4);
-          this.snakes.push(bot);
-        }
-
-        // Spawn Desserts
-        this.food = [];
-        for (let i = 0; i < FOOD_COUNT; i++) {
-          const fAngle = Math.random() * Math.PI * 2;
-          const fDist = Math.random() * (WORLD_RADIUS - 60);
-          this.food.push(new DessertFood(Math.cos(fAngle) * fDist, Math.sin(fAngle) * fDist));
-        }
-      }
-
-      spawnReplacementBot() {
-        const botThemes = [
-          { name: 'Sprinkle Worm', primary: '#f472b6', secondary: '#fed7aa', hat: '🍩' },
-          { name: 'Gummy Jelly', primary: '#2dd4bf', secondary: '#99f6e4', hat: '🧸' },
-          { name: 'Tiramisu', primary: '#d97706', secondary: '#fde68a', hat: '☕' },
-          { name: 'Strawberry Milk', primary: '#f43f5e', secondary: '#ffe4e6', hat: '🥛' }
-        ];
-        const spawnAngle = Math.random() * Math.PI * 2;
-        const spawnDist = WORLD_RADIUS - 160;
-        const bx = Math.cos(spawnAngle) * spawnDist;
-        const by = Math.sin(spawnAngle) * spawnDist;
-        const theme = botThemes[Math.floor(Math.random() * botThemes.length)];
-        const bot = new CuteSnake(bx, by, theme.name, false, theme);
-        bot.length = 18 + Math.floor(Math.random() * 22);
-        this.snakes.push(bot);
-      }
-
-      handlePlayerInput() {
-        if (!this.player || this.player.isDead) return;
-
-        if (this.joystickActive) return;
-
-        let keyTurn = 0;
-        if (this.keys.ArrowLeft || this.keys.KeyA) keyTurn -= 1;
-        if (this.keys.ArrowRight || this.keys.KeyD) keyTurn += 1;
-
-        if (keyTurn !== 0) {
-          this.player.targetAngle += keyTurn * 0.088;
-          this.useMouseSteering = false;
-          return;
-        }
-
-        if (this.useMouseSteering) {
-          const screenCenterX = screenWidth / 2;
-          const screenCenterY = screenHeight / 2;
-          const mdx = this.mousePos.x - screenCenterX;
-          const mdy = this.mousePos.y - screenCenterY;
-          if (Math.hypot(mdx, mdy) > 15) {
-            this.player.targetAngle = Math.atan2(mdy, mdx);
-          }
-        }
-      }
-
-      killSnake(snake, reason = 'Bumped into an enemy sweetie') {
-        if (snake.isDead) return;
-        snake.isDead = true;
-
-        // Explode into a shower of delicious cakes and candies!
-        for (let i = 0; i < snake.segments.length; i += 2) {
-          const seg = snake.segments[i];
-          const dessert = DESSERT_TYPES[Math.floor(Math.random() * DESSERT_TYPES.length)];
-          this.food.push(new DessertFood(
-            seg.x + (Math.random() - 0.5) * 20,
-            seg.y + (Math.random() - 0.5) * 20,
-            dessert
-          ));
-        }
-
-        if (snake === this.player) {
-          playKillSound();
-          this.triggerGameOver(reason);
-        } else {
-          if (this.player && !this.player.isDead) {
-            for (let seg of this.player.segments) {
-              if (getDistance(snake.x, snake.y, seg.x, seg.y) < snake.radius + this.player.radius + 15) {
-                this.kills++;
-                break;
+      updateAI(allSnakes) {
+        if (!this.isAI || this.dead) return;
+        this.aiTimer++;
+
+        const player = allSnakes.find(s => !s.isAI && !s.dead);
+
+        // 1. Raycast obstacle avoidance feelers (Detect Arena wall and other snakes)
+        let feelerHit = false;
+        let bestTurnDelta = 0;
+        const feelerDist = 95;
+        const feelerAngles = [0, 0.5, -0.5, 0.9, -0.9, 1.4, -1.4];
+
+        for (let fa of feelerAngles) {
+          const checkAngle = this.angle + fa;
+          const fx = this.x + Math.cos(checkAngle) * feelerDist;
+          const fy = this.y + Math.sin(checkAngle) * feelerDist;
+
+          // Arena boundary test
+          const distToCenter = Math.hypot(fx, fy);
+          let collided = (distToCenter >= ARENA_RADIUS - 40);
+
+          // Other snake collision test
+          if (!collided) {
+            for (let other of allSnakes) {
+              if (other === this || other.dead) continue;
+              const segs = other.getSegmentPositions();
+              // Don't test head directly, test segments
+              for (let s of segs) {
+                if (Math.hypot(fx - s.x, fy - s.y) < this.radius + 16) {
+                  collided = true;
+                  break;
+                }
               }
+              if (collided) break;
             }
           }
-          setTimeout(() => {
-            if (this.isRunning) this.spawnReplacementBot();
-          }, 2400);
+
+          if (collided) {
+            feelerHit = true;
+          } else if (feelerHit && bestTurnDelta === 0) {
+            // Find first free corridor
+            bestTurnDelta = fa;
+          }
         }
-      }
 
-      triggerGameOver(reason) {
-        this.isGameOver = true;
-        const finalScore = Math.floor(this.player ? this.player.score : 0);
+        if (feelerHit) {
+          this.targetAngle += (bestTurnDelta !== 0 ? Math.sign(bestTurnDelta) * 0.18 : 0.22);
+          this.isBoosting = false;
+          return;
+        }
 
-        deathCause.innerText = reason;
-        finalScoreVal.innerText = finalScore;
-        finalKillsVal.innerText = `${this.kills} 🏆`;
-        if (gameOverNameInput) gameOverNameInput.value = this.playerName;
-        gameOverScreen.classList.remove('hidden');
+        // 2. Personality-driven behavior
+        const pType = this.aiConfig.personality;
+
+        if (pType === 'HUNTER' && player) {
+          const distToPlayer = Math.hypot(player.x - this.x, player.y - this.y);
+          if (distToPlayer < 750) {
+            // Cut in front of player
+            const leadX = player.x + Math.cos(player.angle) * 110;
+            const leadY = player.y + Math.sin(player.angle) * 110;
+            this.targetAngle = Math.atan2(leadY - this.y, leadX - this.x);
+            this.isBoosting = (distToPlayer < 380 && this.score > 250);
+            return;
+          }
+        }
+
+        if (pType === 'AMBUSHER' && player) {
+          const distToPlayer = Math.hypot(player.x - this.x, player.y - this.y);
+          if (distToPlayer < 400) {
+            // Circle tight around player
+            const tangentAngle = Math.atan2(player.y - this.y, player.x - this.x) + Math.PI / 2.2;
+            this.targetAngle = tangentAngle;
+            this.isBoosting = (Math.random() < 0.2 && this.score > 200);
+            return;
+          }
+        }
+
+        // Default or Glutton: Hunt nearest sweets
+        let nearestFood = null;
+        let minDist = 650;
+        for (let f of foods) {
+          const d = Math.hypot(f.x - this.x, f.y - this.y);
+          if (d < minDist) {
+            minDist = d;
+            nearestFood = f;
+          }
+        }
+
+        if (nearestFood) {
+          this.targetAngle = Math.atan2(nearestFood.y - this.y, nearestFood.x - this.x);
+          this.isBoosting = (pType === 'GLUTTON' && minDist < 200 && Math.random() < 0.15 && this.score > 300);
+        } else if (this.aiTimer % 60 === 0) {
+          this.targetAngle += (Math.random() - 0.5) * 1.5;
+          this.isBoosting = false;
+        }
       }
 
       update() {
-        if (!this.isRunning) return;
+        if (this.dead) return;
 
-        this.handlePlayerInput();
+        // Angular smoothing
+        let diff = this.targetAngle - this.angle;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        this.angle += diff * (this.isAI ? 0.085 : 0.14);
 
-        // Update snakes
-        for (let i = this.snakes.length - 1; i >= 0; i--) {
-          const s = this.snakes[i];
-          s.update(this.food, this.snakes);
-          if (s.isDead) {
-            this.snakes.splice(i, 1);
+        // Speed & boosting cost
+        const currentSpeed = this.isBoosting ? this.rushSpeed : this.baseSpeed;
+        if (this.isBoosting && this.score > 50) {
+          this.score -= 0.18;
+          if (Math.random() < 0.25) {
+            const tail = this.history[this.history.length - 1];
+            if (tail) foods.push(spawnFood(tail.x + (Math.random()-0.5)*10, tail.y + (Math.random()-0.5)*10));
           }
         }
 
-        // Camera follow player
-        if (this.player && !this.player.isDead) {
-          this.camera.x = lerp(this.camera.x, this.player.x, 0.12);
-          this.camera.y = lerp(this.camera.y, this.player.y, 0.12);
+        // Movement
+        this.x += Math.cos(this.angle) * currentSpeed;
+        this.y += Math.sin(this.angle) * currentSpeed;
+
+        // Record history for body segments
+        this.history.unshift({ x: this.x, y: this.y });
+        const maxHistory = this.length * 10;
+        if (this.history.length > maxHistory) {
+          this.history.pop();
         }
 
-        // Eat Desserts Collision Check
-        for (let snake of this.snakes) {
-          if (snake.isDead) continue;
-          for (let fIdx = this.food.length - 1; fIdx >= 0; fIdx--) {
-            const f = this.food[fIdx];
-            const dist = getDistance(snake.x, snake.y, f.x, f.y);
-            if (dist < snake.radius + f.baseRadius + 6) {
-              snake.length += f.value * 0.45;
-              snake.score += Math.round(f.value * 12);
-              this.food.splice(fIdx, 1);
-
-              if (snake.isPlayer) {
-                playEatSound();
-              }
-            }
-          }
+        // Check arena boundary collision
+        const distFromCenter = Math.hypot(this.x, this.y);
+        if (distFromCenter >= ARENA_RADIUS - this.radius) {
+          this.die();
         }
-
-        // Replenish ambient sweets
-        while (this.food.length < FOOD_COUNT) {
-          const fAngle = Math.random() * Math.PI * 2;
-          const fDist = Math.random() * (WORLD_RADIUS - 50);
-          this.food.push(new DessertFood(Math.cos(fAngle) * fDist, Math.sin(fAngle) * fDist));
-        }
-
-        // ========================================================
-        // SAFE SELF-COLLISION & SLITHER COMBAT
-        // (You CANNOT die touching yourself!)
-        // ========================================================
-        for (let attacker of this.snakes) {
-          if (attacker.isDead) continue;
-
-          for (let target of this.snakes) {
-            if (target === attacker || target.isDead) {
-              // NO SELF-COLLISION! Slither & coil freely over own body!
-              continue;
-            }
-
-            for (let segIdx = 0; segIdx < target.segments.length; segIdx++) {
-              const seg = target.segments[segIdx];
-              const collisionDist = getDistance(attacker.x, attacker.y, seg.x, seg.y);
-
-              if (collisionDist < attacker.radius + target.radius * 0.8) {
-                const reason = attacker.isPlayer
-                  ? `Bumped into ${target.name}'s tail frosting!`
-                  : `Collided with ${target.name}`;
-                this.killSnake(attacker, reason);
-                break;
-              }
-            }
-            if (attacker.isDead) break;
-          }
-        }
-
-        // Update HUD
-        if (this.player) {
-          scoreVal.innerText = Math.floor(this.player.score);
-          lengthVal.innerText = Math.floor(this.player.length);
-          enemiesCountVal.innerText = this.snakes.filter(s => !s.isPlayer && !s.isDead).length;
-        }
-
-        this.updateLeaderboard();
       }
 
-      updateLeaderboard() {
-        const sorted = [...this.snakes].sort((a, b) => b.score - a.score).slice(0, 5);
-        leaderboardList.innerHTML = '';
-        sorted.forEach((snake, idx) => {
-          const li = document.createElement('li');
-          li.className = 'flex justify-between items-center ' + (snake.isPlayer ? 'text-pink-600 font-extrabold' : 'text-slate-600 font-medium');
-          li.innerHTML = `
-            <span class="truncate max-w-[100px]">${idx + 1}. ${snake.name}</span>
-            <span class="text-right text-pink-500 font-mono font-bold">${Math.floor(snake.score)}</span>
-          `;
-          leaderboardList.appendChild(li);
+      die() {
+        if (this.dead) return;
+        this.dead = true;
+        emitSweetBurst(this.x, this.y, 35, this.colors.primary);
+
+        // Drop body as sweet food treats
+        const segs = this.getSegmentPositions();
+        for (let i = 0; i < segs.length; i += 2) {
+          foods.push(spawnFood(
+            segs[i].x + (Math.random() - 0.5) * 16,
+            segs[i].y + (Math.random() - 0.5) * 16
+          ));
+        }
+
+        if (!this.isAI) {
+          soundGameOver();
+          showGameOver();
+        } else {
+          soundDefeatEnemy();
+        }
+      }
+
+      draw(ctx) {
+        if (this.dead) return;
+        const segs = this.getSegmentPositions();
+
+        // 1. Draw Body Segments (from tail to neck)
+        for (let i = segs.length - 1; i >= 1; i--) {
+          const pt = segs[i];
+          const isStripe = (i % 2 === 0);
+          const rad = this.radius * (1 - (i / segs.length) * 0.32);
+
+          // Glow outline
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, rad + 3, 0, Math.PI * 2);
+          ctx.fillStyle = this.colors.border;
+          ctx.fill();
+
+          // Bubble interior
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, rad, 0, Math.PI * 2);
+          ctx.fillStyle = isStripe ? this.colors.primary : this.colors.secondary;
+          ctx.fill();
+
+          // Dark gloss highlight
+          ctx.beginPath();
+          ctx.arc(pt.x - rad * 0.3, pt.y - rad * 0.3, rad * 0.28, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+          ctx.fill();
+        }
+
+        // 2. Draw Head
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        // Head shadow / glow
+        ctx.shadowColor = this.colors.glow;
+        ctx.shadowBlur = 12;
+
+        // Head Outer border
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius + 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = this.colors.border;
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+
+        // Head Base
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.colors.primary;
+        ctx.fill();
+
+        // Cheeks
+        if (!this.isAI) {
+          // Rosy cute cheeks for player
+          ctx.beginPath();
+          ctx.ellipse(4, -this.radius * 0.58, 5, 3.5, 0, 0, Math.PI * 2);
+          ctx.ellipse(4, this.radius * 0.58, 5, 3.5, 0, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 120, 160, 0.6)';
+          ctx.fill();
+        } else {
+          // Dark menacing blush / vents for enemies
+          ctx.beginPath();
+          ctx.ellipse(3, -this.radius * 0.55, 4, 2.5, 0, 0, Math.PI * 2);
+          ctx.ellipse(3, this.radius * 0.55, 4, 2.5, 0, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+          ctx.fill();
+        }
+
+        // Big Anime Eyes
+        const eyeOffset = this.radius * 0.45;
+        const eyeX = this.radius * 0.35;
+
+        [-eyeOffset, eyeOffset].forEach(eyeY => {
+          // Eye sclera
+          ctx.beginPath();
+          ctx.arc(eyeX, eyeY, 6.5, 0, Math.PI * 2);
+          ctx.fillStyle = this.isAI ? '#111' : '#ffffff';
+          ctx.fill();
+
+          // Dark AI glowing iris / Player pupil
+          ctx.beginPath();
+          ctx.arc(eyeX + 1.5, eyeY, 4, 0, Math.PI * 2);
+          ctx.fillStyle = this.isAI ? this.colors.eyeGlow : '#1a0510';
+          ctx.fill();
+
+          // Eye Catchlight sparkle
+          ctx.beginPath();
+          ctx.arc(eyeX + 2.5, eyeY - 1.5, 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
         });
-      }
 
-      drawWaffleGrid(camX, camY) {
-        // Cute Pastel Waffle / Sprinkle Grid Background
-        const gridSize = 72;
-        const offsetX = (screenWidth / 2 - camX) % gridSize;
-        const offsetY = (screenHeight / 2 - camY) % gridSize;
+        // Topping on the head (Strawberry / Dark Horn / Topping)
+        ctx.font = `${this.radius * 1.05}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.colors.topping, -this.radius * 0.35, 0);
 
-        ctx.strokeStyle = 'rgba(251, 207, 232, 0.45)'; // soft pink grid lines
-        ctx.lineWidth = 1.5;
+        ctx.restore();
 
-        ctx.beginPath();
-        for (let x = offsetX; x < screenWidth; x += gridSize) {
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, screenHeight);
-        }
-        for (let y = offsetY; y < screenHeight; y += gridSize) {
-          ctx.moveTo(0, y);
-          ctx.lineTo(screenWidth, y);
-        }
-        ctx.stroke();
-
-        // Arena Circular Candy Cane / Biscuit Border
-        const boundaryScreenX = 0 - camX + screenWidth / 2;
-        const boundaryScreenY = 0 - camY + screenHeight / 2;
-
-        // Thick Candy Icing Ring
-        ctx.beginPath();
-        ctx.arc(boundaryScreenX, boundaryScreenY, WORLD_RADIUS, 0, Math.PI * 2);
-        ctx.strokeStyle = '#f472b6';
-        ctx.lineWidth = 10;
-        ctx.stroke();
-
-        // Inner Sprinkle Ring
-        ctx.beginPath();
-        ctx.arc(boundaryScreenX, boundaryScreenY, WORLD_RADIUS, 0, Math.PI * 2);
+        // 3. Name Tag
+        ctx.save();
+        ctx.font = "800 13px 'Nunito', sans-serif";
+        ctx.textAlign = 'center';
+        ctx.fillStyle = this.isAI ? '#3d2f3d' : '#e6005c';
         ctx.strokeStyle = '#ffffff';
-        ctx.setLineDash([16, 16]);
-        ctx.lineWidth = 6;
-        ctx.stroke();
-        ctx.setLineDash([]); // reset
-      }
-
-      drawMinimap() {
-        minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
-        const mapW = minimapCanvas.width;
-        const mapH = minimapCanvas.height;
-        const scale = mapW / (WORLD_RADIUS * 2.2);
-
-        const centerX = mapW / 2;
-        const centerY = mapH / 2;
-
-        // Boundary
-        minimapCtx.beginPath();
-        minimapCtx.arc(centerX, centerY, WORLD_RADIUS * scale, 0, Math.PI * 2);
-        minimapCtx.strokeStyle = '#f472b6';
-        minimapCtx.lineWidth = 2.5;
-        minimapCtx.stroke();
-
-        // Mini Desserts (little dots)
-        minimapCtx.fillStyle = '#fbcfe8';
-        for (let i = 0; i < this.food.length; i += 7) {
-          const f = this.food[i];
-          const mx = centerX + f.x * scale;
-          const my = centerY + f.y * scale;
-          minimapCtx.fillRect(mx, my, 1.5, 1.5);
-        }
-
-        // Enemy Snakes
-        for (let s of this.snakes) {
-          if (s.isDead || s.isPlayer) continue;
-          const sx = centerX + s.x * scale;
-          const sy = centerY + s.y * scale;
-          minimapCtx.beginPath();
-          minimapCtx.arc(sx, sy, 2.5, 0, Math.PI * 2);
-          minimapCtx.fillStyle = '#a855f7';
-          minimapCtx.fill();
-        }
-
-        // Player marker with heart
-        if (this.player && !this.player.isDead) {
-          const px = centerX + this.player.x * scale;
-          const py = centerY + this.player.y * scale;
-
-          minimapCtx.beginPath();
-          minimapCtx.arc(px, py, 4.5, 0, Math.PI * 2);
-          minimapCtx.fillStyle = '#ec4899';
-          minimapCtx.fill();
-
-          // Heading direction line
-          minimapCtx.beginPath();
-          minimapCtx.moveTo(px, py);
-          minimapCtx.lineTo(px + Math.cos(this.player.angle) * 8, py + Math.sin(this.player.angle) * 8);
-          minimapCtx.strokeStyle = '#ffffff';
-          minimapCtx.lineWidth = 2;
-          minimapCtx.stroke();
-        }
-      }
-
-      render() {
-        // Pastel Cream Canvas Background
-        ctx.fillStyle = '#fff4f7';
-        ctx.fillRect(0, 0, screenWidth, screenHeight);
-
-        const camX = this.camera.x;
-        const camY = this.camera.y;
-
-        // 1. Draw Waffle Arena
-        this.drawWaffleGrid(camX, camY);
-
-        // 2. Draw Desserts
-        for (let f of this.food) {
-          f.update();
-          f.draw(ctx, camX, camY);
-        }
-
-        // 3. Draw Kawaii Snakes
-        for (let snake of this.snakes) {
-          snake.draw(ctx, camX, camY);
-        }
-
-        // 4. Draw Mini-map
-        this.drawMinimap();
-      }
-
-      start() {
-        initAudio();
-        const enteredName = playerNameInput.value.trim();
-        if (enteredName) {
-          this.playerName = enteredName;
-          try { localStorage.setItem('sweetie_snake_name', enteredName); } catch(e) {}
-        }
-        this.spawnPlayer();
-        this.isRunning = true;
-        introScreen.classList.add('hidden');
-        gameOverScreen.classList.add('hidden');
-        hudLayer.classList.remove('hidden');
-        minimapContainer.classList.remove('hidden');
-      }
-
-      restart() {
-        const enteredName = gameOverNameInput.value.trim();
-        if (enteredName) {
-          this.playerName = enteredName;
-          if (playerNameInput) playerNameInput.value = enteredName;
-          try { localStorage.setItem('sweetie_snake_name', enteredName); } catch(e) {}
-        }
-        this.spawnPlayer();
-        gameOverScreen.classList.add('hidden');
+        ctx.lineWidth = 3.5;
+        ctx.strokeText(this.name, this.x, this.y - this.radius - 12);
+        ctx.fillText(this.name, this.x, this.y - this.radius - 12);
+        ctx.restore();
       }
     }
 
-    /* ========================================================
-       BOOTSTRAP & LOOP
-       ======================================================== */
-    let game;
+    // Helper: Safe Spawn Position (Guarantees player & enemies never spawn in same place)
+    function getSafeSpawnPosition(existingSnakes, minClearance = 720) {
+      for (let attempt = 0; attempt < 80; attempt++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 300 + Math.random() * (ARENA_RADIUS - 600);
+        const candidate = {
+          x: Math.cos(angle) * dist,
+          y: Math.sin(angle) * dist
+        };
 
-    window.onload = function () {
-      game = new GameEngine();
-
-      const cuteNames = ['SugarPuff', 'Mochi', 'BerryBite', 'HoneyBun', 'CottonFluff', 'SweetiePie', 'DonutDolly', 'StrawberrySwirl', 'BubbleTea', 'PuddingPop'];
-      if (randomNameBtn) {
-        randomNameBtn.addEventListener('click', () => {
-          const rand = cuteNames[Math.floor(Math.random() * cuteNames.length)];
-          playerNameInput.value = rand;
-          if (gameOverNameInput) gameOverNameInput.value = rand;
-        });
-      }
-
-      startBtn.addEventListener('click', () => {
-        game.start();
-      });
-
-      respawnBtn.addEventListener('click', () => {
-        game.restart();
-      });
-
-      function gameLoop() {
-        try {
-          game.update();
-          game.render();
-        } catch (e) {
-          console.error("Game loop error: ", e);
+        let isFarEnough = true;
+        for (let other of existingSnakes) {
+          if (!other || other.dead) continue;
+          if (Math.hypot(candidate.x - other.x, candidate.y - other.y) < minClearance) {
+            isFarEnough = false;
+            break;
+          }
         }
-        requestAnimationFrame(gameLoop);
+
+        if (isFarEnough) return candidate;
+      }
+      // Fallback
+      return { x: (Math.random() - 0.5) * 800, y: (Math.random() - 0.5) * 800 };
+    }
+
+    // Game Instances
+    let playerSnake = null;
+    let enemySnakes = [];
+    let camera = { x: 0, y: 0 };
+    let gameRunning = false;
+
+    function initGame() {
+      const playerName = nicknameInput.value.trim() || 'Berry Mochi';
+      
+      // Clear arrays
+      foods = [];
+      particles = [];
+      enemySnakes = [];
+
+      // Create Player centrally
+      playerSnake = new Snake(0, 0, playerName, false);
+      const activeList = [playerSnake];
+
+      // Spawn AI Rivals with safe distance spacing
+      AI_CONFIGS.forEach((config) => {
+        const safePos = getSafeSpawnPosition(activeList, 720);
+        const enemy = new Snake(safePos.x, safePos.y, config.name, true, config);
+        enemySnakes.push(enemy);
+        activeList.push(enemy);
+      });
+
+      initFoodCluster();
+      gameRunning = true;
+    }
+
+    // Respawn single enemy safely
+    function respawnEnemy(enemy) {
+      setTimeout(() => {
+        if (!gameRunning) return;
+        const allCurrent = [playerSnake, ...enemySnakes.filter(e => !e.dead)];
+        const safePos = getSafeSpawnPosition(allCurrent, 750);
+        
+        enemy.x = safePos.x;
+        enemy.y = safePos.y;
+        enemy.dead = false;
+        enemy.score = 280 + Math.floor(Math.random() * 200);
+        enemy.length = 24;
+        enemy.history = [];
+        for (let i = 0; i < enemy.length * 9; i++) {
+          enemy.history.push({ x: enemy.x, y: enemy.y });
+        }
+      }, 3500);
+    }
+
+    // Collisions and Eating Rules
+    function handleCollisions() {
+      const allSnakes = [playerSnake, ...enemySnakes].filter(s => s && !s.dead);
+
+      // 1. Food Gathering
+      for (let snake of allSnakes) {
+        for (let i = foods.length - 1; i >= 0; i--) {
+          const f = foods[i];
+          const dist = Math.hypot(snake.x - f.x, snake.y - f.y);
+          if (dist < snake.radius + f.size) {
+            snake.score += f.type.points;
+            snake.length = Math.min(220, 24 + Math.floor(snake.score / 28));
+            foods.splice(i, 1);
+            foods.push(spawnFood()); // Maintain world density
+
+            if (snake === playerSnake) {
+              soundEat();
+              scoreValEl.textContent = Math.floor(playerSnake.score);
+            }
+          }
+        }
       }
 
-      requestAnimationFrame(gameLoop);
+      // 2. Snake vs Snake elimination (Slither rules: Hitting another body dies; self-crossing is immune)
+      for (let headSnake of allSnakes) {
+        for (let bodySnake of allSnakes) {
+          // Immune to hitting own body
+          if (headSnake === bodySnake) continue;
+
+          const segs = bodySnake.getSegmentPositions();
+          for (let s of segs) {
+            const hitDist = Math.hypot(headSnake.x - s.x, headSnake.y - s.y);
+            if (hitDist < headSnake.radius + bodySnake.radius * 0.75) {
+              // headSnake crashes into bodySnake's body!
+              headSnake.die();
+
+              if (headSnake.isAI) {
+                respawnEnemy(headSnake);
+              }
+              break;
+            }
+          }
+          if (headSnake.dead) break;
+        }
+      }
+    }
+
+    // Floating Joystick State & Event Handlers
+    let joystickActive = false;
+    let joystickTouchId = null;
+    let joyCenter = { x: 0, y: 0 };
+    const maxJoyRadius = 55;
+
+    function handleJoyStart(clientX, clientY, id = null) {
+      if (!gameRunning) return;
+      joystickActive = true;
+      joystickTouchId = id;
+      joyCenter = { x: clientX, y: clientY };
+
+      joystickBase.style.left = `${clientX}px`;
+      joystickBase.style.top = `${clientY}px`;
+      joystickBase.style.display = 'block';
+
+      joystickStick.style.transform = `translate(-50%, -50%) translate(0px, 0px)`;
+    }
+
+    function handleJoyMove(clientX, clientY) {
+      if (!joystickActive || !playerSnake) return;
+      const dx = clientX - joyCenter.x;
+      const dy = clientY - joyCenter.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist > 8) {
+        playerSnake.targetAngle = Math.atan2(dy, dx);
+      }
+
+      const clampedDist = Math.min(dist, maxJoyRadius);
+      const angle = Math.atan2(dy, dx);
+      const stickX = Math.cos(angle) * clampedDist;
+      const stickY = Math.sin(angle) * clampedDist;
+
+      joystickStick.style.transform = `translate(calc(-50% + ${stickX}px), calc(-50% + ${stickY}px))`;
+    }
+
+    function handleJoyEnd() {
+      joystickActive = false;
+      joystickTouchId = null;
+      joystickBase.style.display = 'none';
+      joystickStick.style.transform = `translate(-50%, -50%)`;
+    }
+
+    // Pointer Events on Canvas
+    window.addEventListener('pointerdown', (e) => {
+      // Ignore if clicking HUD or Rush Button
+      if (e.target.closest('#rush-btn') || e.target.closest('#score-card') || e.target.closest('#leaderboard-card')) return;
+      if (!joystickActive) {
+        handleJoyStart(e.clientX, e.clientY, e.pointerId);
+      }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (joystickActive && e.pointerId === joystickTouchId) {
+        handleJoyMove(e.clientX, e.clientY);
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (joystickActive && e.pointerId === joystickTouchId) {
+        handleJoyEnd();
+      }
+    });
+
+    window.addEventListener('pointercancel', (e) => {
+      if (joystickActive && e.pointerId === joystickTouchId) {
+        handleJoyEnd();
+      }
+    });
+
+    // Rush Button Pointer Listeners
+    rushBtn.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      if (playerSnake) playerSnake.isBoosting = true;
+      rushBtn.classList.add('active');
+    });
+
+    const releaseRush = () => {
+      if (playerSnake) playerSnake.isBoosting = false;
+      rushBtn.classList.remove('active');
     };
+
+    rushBtn.addEventListener('pointerup', releaseRush);
+    rushBtn.addEventListener('pointerleave', releaseRush);
+    rushBtn.addEventListener('pointercancel', releaseRush);
+
+    // Keyboard support for desktop
+    window.addEventListener('keydown', (e) => {
+      if (!playerSnake || !gameRunning) return;
+      if (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+        playerSnake.isBoosting = true;
+        rushBtn.classList.add('active');
+      }
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') playerSnake.targetAngle -= 0.22;
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') playerSnake.targetAngle += 0.22;
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+        if (playerSnake) playerSnake.isBoosting = false;
+        rushBtn.classList.remove('active');
+      }
+    });
+
+    // UI Updates
+    function updateLeaderboard() {
+      const allSnakes = [playerSnake, ...enemySnakes].filter(s => s !== null);
+      allSnakes.sort((a, b) => b.score - a.score);
+
+      leaderboardListEl.innerHTML = '';
+      allSnakes.slice(0, 5).forEach((snake, idx) => {
+        const row = document.createElement('div');
+        row.className = `lb-row ${snake === playerSnake ? 'player' : ''}`;
+        row.innerHTML = `
+          <span class="lb-rank">#${idx + 1}</span>
+          <span class="lb-name">${snake.name}</span>
+          <span class="lb-val">${Math.floor(snake.score)}</span>
+        `;
+        leaderboardListEl.appendChild(row);
+      });
+    }
+
+    function showGameOver() {
+      gameRunning = false;
+      handleJoyEnd();
+      finalScoreVal.textContent = Math.floor(playerSnake.score);
+      gameoverScreen.style.display = 'flex';
+    }
+
+    // Start / Restart Handlers
+    startBtn.addEventListener('click', () => {
+      initAudio();
+      startScreen.style.display = 'none';
+      initGame();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      initAudio();
+      gameoverScreen.style.display = 'none';
+      initGame();
+    });
+
+    // Render Background & Fine Pink Grid
+    function renderBackground() {
+      // Soft pink arena background
+      ctx.fillStyle = '#ffe8f0';
+      ctx.fillRect(0, 0, screenW, screenH);
+
+      // Grid line calculations aligned with camera
+      const gridSize = 50;
+      const offsetX = -camera.x % gridSize;
+      const offsetY = -camera.y % gridSize;
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#ffd2e2';
+      ctx.lineWidth = 1.2;
+
+      for (let x = offsetX; x < screenW; x += gridSize) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, screenH);
+      }
+      for (let y = offsetY; y < screenH; y += gridSize) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(screenW, y);
+      }
+      ctx.stroke();
+    }
+
+    // Render Glowing Circular Arena Border
+    function renderArenaBoundary() {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(0, 0, ARENA_RADIUS, 0, Math.PI * 2);
+
+      // Glowing red ring
+      ctx.shadowColor = 'rgba(255, 30, 80, 0.8)';
+      ctx.shadowBlur = 24;
+      ctx.lineWidth = 16;
+      ctx.strokeStyle = '#ff2b5e';
+      ctx.stroke();
+
+      // Outer boundary ring border
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Render Food
+    function renderFoods(time) {
+      ctx.font = "20px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      for (let f of foods) {
+        // Culling for performance
+        if (Math.hypot(f.x - camera.x, f.y - camera.y) > Math.max(screenW, screenH) * 0.85) {
+          continue;
+        }
+
+        const pulse = Math.sin(time * 0.004 + f.pulseOffset) * 2;
+        const rad = f.size + pulse;
+
+        // Glowing dessert halo
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, rad + 4, 0, Math.PI * 2);
+        ctx.fillStyle = f.type.glow;
+        ctx.fill();
+
+        // Dessert bubble body
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, rad, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.strokeStyle = f.type.stroke;
+        ctx.lineWidth = 2.5;
+        ctx.fill();
+        ctx.stroke();
+
+        // Dessert emoji icon
+        ctx.fillText(f.type.emoji, f.x, f.y + 1);
+      }
+    }
+
+    // Render Particles
+    function renderParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Main Game Loop
+    let lastLeaderboardUpdate = 0;
+
+    function gameLoop(time) {
+      requestAnimationFrame(gameLoop);
+
+      if (gameRunning && playerSnake) {
+        // AI step
+        enemySnakes.forEach(enemy => {
+          enemy.updateAI([playerSnake, ...enemySnakes]);
+          enemy.update();
+        });
+
+        // Player step
+        playerSnake.update();
+
+        // Collision logic
+        handleCollisions();
+
+        // Camera smoothly tracks player
+        camera.x += (playerSnake.x - camera.x) * 0.1;
+        camera.y += (playerSnake.y - camera.y) * 0.1;
+
+        // Leaderboard throttle
+        if (time - lastLeaderboardUpdate > 250) {
+          updateLeaderboard();
+          lastLeaderboardUpdate = time;
+        }
+      }
+
+      // Drawing
+      ctx.clearRect(0, 0, screenW, screenH);
+      renderBackground();
+
+      // World Camera Transformation
+      ctx.save();
+      ctx.translate(screenW / 2 - camera.x, screenH / 2 - camera.y);
+
+      // Arena boundary ring
+      renderArenaBoundary();
+
+      // Collectibles
+      renderFoods(time);
+
+      // Draw Enemies (Dark Snakes)
+      enemySnakes.forEach(enemy => enemy.draw(ctx));
+
+      // Draw Player Snake
+      if (playerSnake) playerSnake.draw(ctx);
+
+      // Particles
+      renderParticles();
+
+      ctx.restore();
+    }
+
+    requestAnimationFrame(gameLoop);
   </script>
 </body>
 </html>
