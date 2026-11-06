@@ -11,10 +11,12 @@
   <meta name="apple-mobile-web-app-title" content="Classroom">
   <meta name="theme-color" content="#03baa8">
 
-  <!-- Browser Favicon & iOS App Icon Using The Teal Cute Snake -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%2303baa8'/><ellipse cx='90' cy='52' rx='20' ry='7' fill='%239e72bc'/><ellipse cx='90' cy='63' rx='14' ry='5' fill='%239e72bc'/><ellipse cx='76' cy='61' rx='6' ry='4' fill='%23111827'/><ellipse cx='104' cy='61' rx='6' ry='4' fill='%23111827'/><circle cx='64' cy='82' r='19' fill='%231a1a24'/><circle cx='70' cy='78' r='6' fill='%23ffffff'/><circle cx='116' cy='82' r='19' fill='%231a1a24'/><circle cx='122' cy='78' r='6' fill='%23ffffff'/><ellipse cx='49' cy='95' rx='12' ry='7' fill='%23008e82'/><ellipse cx='131' cy='95' rx='12' ry='7' fill='%23008e82'/><ellipse cx='81' cy='87' rx='8' ry='4' fill='%23006d64'/><ellipse cx='99' cy='87' rx='8' ry='4' fill='%23006d64'/><path d='M83,95 Q90,101 97,95' fill='none' stroke='%23004d46' stroke-width='3' stroke-linecap='round'/><path d='M90,99 Q75,108 81,119 Q87,130 73,141' fill='none' stroke='%23ff5b5b' stroke-width='6' stroke-linecap='round'/></svg>">
+  <!-- iPhone Home Screen App Icon & Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./apple-touch-icon.png">
 
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%2303baa8'/><ellipse cx='90' cy='52' rx='20' ry='7' fill='%239e72bc'/><ellipse cx='90' cy='63' rx='14' ry='5' fill='%239e72bc'/><ellipse cx='76' cy='61' rx='6' ry='4' fill='%23111827'/><ellipse cx='104' cy='61' rx='6' ry='4' fill='%23111827'/><circle cx='64' cy='82' r='19' fill='%231a1a24'/><circle cx='70' cy='78' r='6' fill='%23ffffff'/><circle cx='116' cy='82' r='19' fill='%231a1a24'/><circle cx='122' cy='78' r='6' fill='%23ffffff'/><ellipse cx='49' cy='95' rx='12' ry='7' fill='%23008e82'/><ellipse cx='131' cy='95' rx='12' ry='7' fill='%23008e82'/><ellipse cx='81' cy='87' rx='8' ry='4' fill='%23006d64'/><ellipse cx='99' cy='87' rx='8' ry='4' fill='%23006d64'/><path d='M83,95 Q90,101 97,95' fill='none' stroke='%23004d46' stroke-width='3' stroke-linecap='round'/><path d='M90,99 Q75,108 81,119 Q87,130 73,141' fill='none' stroke='%23ff5b5b' stroke-width='6' stroke-linecap='round'/></svg>">
+  <!-- Web App Manifest for iOS PWA -->
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Classroom%22%2C%22short_name%22%3A%22Classroom%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22apple-touch-icon.png%22%2C%22sizes%22%3A%22180x180%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2303baa8%22%2C%22theme_color%22%3A%22%2303baa8%22%7D">
 
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -44,7 +46,6 @@
       background-color: #ffe8f0;
     }
 
-    /* Top Left Sugar Score Card */
     #score-card {
       position: absolute;
       top: calc(env(safe-area-inset-top, 16px) + 12px);
@@ -88,7 +89,6 @@
       line-height: 1.1;
     }
 
-    /* Top Right Live Leaderboard */
     #leaderboard-card {
       position: absolute;
       top: calc(env(safe-area-inset-top, 16px) + 12px);
@@ -150,7 +150,6 @@
       color: #e6195e;
     }
 
-    /* Floating Virtual Joystick */
     #joystick-base {
       position: absolute;
       width: 140px;
@@ -182,7 +181,6 @@
       pointer-events: none;
     }
 
-    /* Rush Button */
     #rush-btn {
       position: absolute;
       bottom: calc(env(safe-area-inset-bottom, 20px) + 16px);
@@ -222,7 +220,6 @@
       text-shadow: 0 2px 4px rgba(0,0,0,0.25);
     }
 
-    /* Modals */
     #start-screen, #gameover-screen {
       position: absolute;
       inset: 0;
@@ -261,6 +258,7 @@
       margin: 0 auto 10px auto;
       box-shadow: 0 8px 20px rgba(3, 186, 168, 0.35);
       display: block;
+      object-fit: cover;
     }
 
     .game-title, .gameover-title {
@@ -368,24 +366,7 @@
 
   <div id="start-screen">
     <div class="modal-box">
-      <!-- App Icon Visual Preview -->
-      <svg class="app-preview-icon" viewBox="0 0 180 180">
-        <rect width="180" height="180" rx="40" fill="#03baa8"/>
-        <ellipse cx="90" cy="52" rx="20" ry="7" fill="#9e72bc"/>
-        <ellipse cx="90" cy="63" rx="14" ry="5" fill="#9e72bc"/>
-        <ellipse cx="76" cy="61" rx="6" ry="4" fill="#111827"/>
-        <ellipse cx="104" cy="61" rx="6" ry="4" fill="#111827"/>
-        <circle cx="64" cy="82" r="19" fill="#1a1a24"/>
-        <circle cx="70" cy="78" r="6" fill="#ffffff"/>
-        <circle cx="116" cy="82" r="19" fill="#1a1a24"/>
-        <circle cx="122" cy="78" r="6" fill="#ffffff"/>
-        <ellipse cx="49" cy="95" rx="12" ry="7" fill="#008e82"/>
-        <ellipse cx="131" cy="95" rx="12" ry="7" fill="#008e82"/>
-        <ellipse cx="81" cy="87" rx="8" ry="4" fill="#006d64"/>
-        <ellipse cx="99" cy="87" rx="8" ry="4" fill="#006d64"/>
-        <path d="M83,95 Q90,101 97,95" fill="none" stroke="#004d46" stroke-width="3" stroke-linecap="round"/>
-        <path d="M90,99 Q75,108 81,119 Q87,130 73,141" fill="none" stroke="#ff5b5b" stroke-width="6" stroke-linecap="round"/>
-      </svg>
+      <img class="app-preview-icon" src="./apple-touch-icon.png" alt="Snake Icon" onerror="this.style.display='none'">
       <h1 class="game-title">Sugar Slither</h1>
       <div class="credit-badge">By Luke Chiu</div>
       <div class="input-group">
@@ -847,7 +828,6 @@
       }
     }
 
-    // Dynamic Touch & Floating Joystick
     let joystickActive = false;
     let joystickTouchId = null;
     let joyCenter = { x: 0, y: 0 };
